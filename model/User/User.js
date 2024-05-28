@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required:[true, 'Password is required']
     },
-    postCount: {
+    postoCunt: {
         type: Number,
         default: 0
     },
@@ -65,7 +65,12 @@ const userSchema = new mongoose.Schema({
             ref: "Post",
         },
     ],
-});
+},
+{
+    timestamps: true
+}
+
+);
 
 const User = mongoose.model('User', userSchema);
-models.exports = User;
+module.exports = User;

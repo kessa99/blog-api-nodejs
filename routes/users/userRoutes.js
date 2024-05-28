@@ -1,6 +1,4 @@
 const express = require('express');
-const userRouter = express.Router();
-
 const {
     userRegisterCtrl,
     userLoginCtrl,
@@ -10,6 +8,8 @@ const {
     deleteUserCtrl,
     userLogoutCtrl
 } = require('../../controllers/users/userCtrl');
+
+const userRouter = express.Router();
 
 //POST/api/v1/users/register
 userRouter.post('/register', userRegisterCtrl);

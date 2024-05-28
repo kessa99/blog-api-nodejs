@@ -21,13 +21,29 @@ const app = express();
 
 // middleware
 
+app.use(express.json());
+const userAuth = {
+    isLogin: true,
+    isAdmin: false,
+}
+
+app.use((req, res, next) => {
+    if (userAuth.isLogin) {
+        next();
+    } else {
+        res.json({
+            message: 'You are not login'
+        });
+    }
+});
+
+
 
 // ROUTES
-app.use('/api/v1/users/', userRouter);
+app.use('/api/v1/users', userRouter);
 app.use('/api/v1/posts/', postRouter);
 app.use('/api/v1/comments/', commentRouter);
 app.use('/api/v1/category/', categoryRouter);
-
 
 
 //Error handlers middelware

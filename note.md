@@ -10,7 +10,7 @@ Rendez vous sur votre github puis creer un nouveau repertoire par la suite clone
 L'extension "Thunder Client" pour Visual Studio Code est un outil léger et puissant conçu pour tester et faire des requêtes HTTP. Elle est similaire à des outils comme Postman ou Insomnia, mais intégrée directement dans l'éditeur Visual Studio Code, ce qui la rend pratique pour les développeurs qui préfèrent ne pas quitter leur environnement de développement pour tester leurs API.
 
 Fonctionnalités Principales de Thunder Client
-- Tester les API : Vous pouvez faire des requêtes GET, POST, PUT, DELETE, etc., directement depuis Visual Studio Code.
+- Tester les API : Vous pouvez faire des requêtes `GET, POST, PUT, DELETE, etc.`, directement depuis Visual Studio Code.
 - Historique des requêtes : Thunder Client garde un historique de vos requêtes, vous permettant de les réutiliser facilement.
 - Environnement de requête : Vous pouvez créer des environnements pour gérer différentes configurations (par exemple, développement, test, production).
 - Collections : Organisez vos requêtes en collections pour les gérer plus facilement.
@@ -1293,98 +1293,707 @@ Les méthodes d'authentification que vous avez mentionnées ci dessous sont spé
 
 En résumé, les méthodes que vous avez mentionnées sont des variantes et des implémentations spécifiques des concepts généraux d'authentification, adaptées à des besoins particuliers en termes de gestion des sessions et de sécurité dans les applications web.
 
+## Comment Fonctionne le JWT
+
+L'authentification basée sur JSON Web Token (JWT) est une méthode sécurisée pour gérer les sessions et l'authentification dans les applications web et mobiles. Voici comment elle fonctionne en détail :
+
+### 1. Connexion de l'utilisateur
+
+1. **Utilisateur envoie ses identifiants** :
+   - L'utilisateur soumet son nom d'utilisateur et son mot de passe à l'application via un formulaire de connexion.
+
+2. **Vérification des identifiants** :
+   - Le serveur reçoit les identifiants, les vérifie contre une base de données ou un service d'authentification. Si les informations sont correctes, le serveur procède à l'étape suivante.
+
+### 2. Génération du JWT
+
+1. **Création du payload** :
+   - Le serveur crée un objet JSON appelé "payload" qui contient les informations de l'utilisateur (par exemple, `userId`, `username`, et autres claims pertinents).
+
+2. **Signature du token** :
+   - Le serveur signe le payload en utilisant une clé secrète (pour HMAC) ou une paire de clés publique/privée (pour RSA). La signature assure que le token n'a pas été altéré.
+
+3. **Génération du token** :
+   - Le serveur génère le JWT, qui se compose de trois parties encodées en Base64 et séparées par des points (`.`):
+     - **Header** : Indique le type de token (JWT) et l'algorithme de signature utilisé.
+     - **Payload** : Contient les données (claims) de l'utilisateur.
+     - **Signature** : La signature cryptographique pour vérifier l'intégrité du token.
+
+Exemple d'un JWT :
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+.eyJ1c2VySWQiOiIxMjM0NTY3ODkwIiwidXNlcm5hbWUiOiJqb2huZG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ
+.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+```
+
+### 3. Envoi du JWT au client
+
+- Le serveur renvoie le JWT au client. Cela peut se faire via le corps de la réponse, un cookie sécurisé, ou un en-tête HTTP.
+
+### 4. Utilisation du JWT pour accéder aux ressources protégées
+
+1. **Client envoie le JWT** :
+   - Pour chaque requête aux ressources protégées, le client envoie le JWT. Cela se fait généralement via l'en-tête HTTP `Authorization` en utilisant le schéma `Bearer` :
+     ```
+     Authorization: Bearer <token>
+     ```
+
+2. **Vérification du JWT** :
+   - Le serveur reçoit la requête et extrait le token de l'en-tête `Authorization`.
+   - Le serveur vérifie la signature du token en utilisant la clé secrète ou la clé publique. Si la signature est valide, le serveur sait que le token n'a pas été altéré.
+
+3. **Décodage et utilisation du JWT** :
+   - Le serveur décode le payload du JWT et utilise les informations contenues (comme `userId`, `role`, etc.) pour traiter la requête. Si le token est valide et non expiré, le serveur autorise l'accès à la ressource demandée.
+
+### 5. Expiration et renouvellement du JWT
+
+- **Expiration** : Les JWT ont une durée de vie limitée spécifiée dans le payload (par exemple, `exp`). Une fois expiré, le client doit obtenir un nouveau token.
+- **Renouvellement** : Le serveur peut implémenter un mécanisme de renouvellement (refresh token) pour émettre un nouveau JWT sans que l'utilisateur ait besoin de se reconnecter.
+
+### Exemple de flux complet en code (Node.js avec Express et jsonwebtoken)
+
 ```javascript
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const app = express();
+const secretKey = 'your_secret_key';
+
+// Middleware pour parser le JSON
+app.use(express.json());
+
+// Endpoint de connexion
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    // Vérifier les identifiants (exemple simplifié)
+    if (username === 'john' && password === 'password') {
+        // Créer le payload
+        const payload = { userId: 1, username: 'john' };
+        // Signer le token
+        const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });
+        // Envoyer le token au client
+        res.json({ token });
+    } else {
+        res.status(401).json({ message: 'Invalid credentials' });
+    }
+});
+
+// Middleware pour vérifier le token
+const authenticateJWT = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+        jwt.verify(token, secretKey, (err, user) => {
+            if (err) {
+                return res.sendStatus(403);
+            }
+            req.user = user;
+            next();
+        });
+    } else {
+        res.sendStatus(401);
+    }
+};
+
+// Route protégée
+app.get('/protected', authenticateJWT, (req, res) => {
+    res.json({ message: 'This is a protected route', user: req.user });
+});
+
+// Démarrer le serveur
+app.listen(3000, () => {
+    console.log('Server started on port 3000');
+});
+```
+
+### Avantages de l'authentification JWT
+- **Stateless** : Le serveur n'a pas besoin de stocker les sessions. Toutes les informations sont contenues dans le token.
+- **Scalabilité** : Facile à mettre en œuvre dans des architectures distribuées et des microservices.
+- **Simplicité** : Les clients peuvent utiliser le même token pour accéder à plusieurs services et ressources.
+
+### Inconvénients de l'authentification JWT
+- **Sécurité** : Si un token est compromis, il peut être utilisé jusqu'à son expiration.
+- **Révocation** : Difficile de révoquer un token avant son expiration sans maintenir une liste de tokens révoqués.
+- **Taille** : Les tokens peuvent devenir volumineux, surtout avec de nombreuses informations dans le payload.
+
+En résumé, l'authentification JWT est une méthode puissante et flexible pour gérer les sessions et l'authentification, particulièrement adaptée aux applications modernes et distribuées.
+
+## Pour faire simple
+
+Voici une explication simple et concise de l'authentification JWT :
+
+1. **Connexion** : L'utilisateur se connecte en envoyant son nom d'utilisateur et son mot de passe au serveur.
+2. **Création du token** : Si les identifiants sont corrects, le serveur crée un token JWT qui contient des informations sur l'utilisateur.
+3. **Envoi du token** : Le serveur renvoie le token au client.
+4. **Utilisation du token** : Le client envoie le token avec chaque requête pour accéder aux ressources protégées.
+5. **Vérification du token** : Le serveur vérifie le token à chaque requête pour s'assurer qu'il est valide et n'a pas été modifié.
+
+En résumé, le JWT est comme un badge d'accès : une fois que vous l'avez, vous pouvez l'utiliser pour entrer et sortir sans avoir à vous reconnecter à chaque fois.
+
+## MIDDLEWARE
+
+Notons que les middlewares avant les routes et les controllers comme vu dans la structure precedente, c'est a dire:
+
+```javascript
+const express = require('express');
+const mongoose = require('mongoose');
+const app = express();
+
+//middleware
+//routes
+//Error handlers middelware
+//listen server
+const PORT = process.env.PORT || 9000;
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+```
+
+SI vous le placer apres il y aura un soucis. Testons maintenant les midddleware avec cet petit code
+
+```javascript
+// middleware
+const userAuth = {
+    isLogin: false,
+    isAdmin: false,
+}
+
+app.use((req, res, next) => {});
+```
+pour le moment rien de bien mechant mais quand nous verifions sur notre thunder client, on verra ceci:
+
+
+Mais au lieu d'afficher une reponse comme on l'a configurer, il y aura:
+
+![processing](readme-file/thunderMiddleware.png)
+
+bien passons au premiere couche pour configurer les middleware
+* 1- ajouter dans userCtrl:
+```javascript
+const User = require('../../model/User/User'); 
+```
+* 2- Dans le fichier server.js ajouter
+```javascript
+app.use(express.json());
+```
+il permettra l'affichage des elmenets en formats json qui seront saisie dans le body. Pour se faire ajoutez dans le fichier userCtrl.js:
+```javascript
+    console.log(req.body);
+```
+
+comme ceci: 
+```javascript
+const User = require('../../model/User/User'); 
+
+const userRegisterCtrl = async(req, res) => {
+    console.log(req.body);
+    try{
+        res.json({
+            status: 'success',
+            message: 'User registered successfully'
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+};
+```
+
+Bon en allant sur thunder client et en mettans quelques informations dans le body un peu du genre
+```javascript
+{
+  "firtsname": "john",
+  "lastname": "john",
+  "email": "test@gmail.com"
+}
+```
+
+vous pouvz mieux voire sur cette photo
+![res.body](readme-file/res.body.png)
+
+`Tout Fonctionne` Donc on peu evoluer.
+
+Nous allons maintenant enlever le `console.log` dans le `userCtrl` puis le remplacer par quelque chose de plus evoluer on a dire:
+
+```javascript
+const User = require('../../model/User/User');
+
+const userRegisterCtrl = async (req, res) => {
+    const {
+        firstname,
+        lastname,
+        email,
+        password
+    } = req.body;
+
+    try {
+        // Vérifier si l'utilisateur existe déjà
+        const userFound = await User.findOne({ email });
+        if (userFound) {
+            return res.json({
+                msg: 'User already exists'
+            });
+        }
+
+        // Hacher le mot de passe
+
+
+        // Créer un nouvel utilisateur
+        const user = await User.create({
+            firstname,
+            lastname,
+            email,
+            password
+        });
+
+        console.log('User created successfully');
+        return res.json({
+            status: 'succès',
+            data: user
+        });
+    } catch (err) {
+        console.log('Errr occurred:', err.message);
+        return res.json({
+            message: err.message
+        });
+    }
+};
+```
+Dans le test de Thunder nous aurons
+
+![res.body](readme-file/firstUser.png)
+
+
+Dans la base de donnee tout est affiche
+![res.body](readme-file/UserInData.png)
+
+**ATTENTION**
+
+Si vous remarquer il n'y a pas la date de creation de l'utilisateur
+pour se faire nous allons ajouter un petit element en plus au model user
+
+```javascript
+    {
+        timestamps: true
+    }
+```
+
+regardez ou je l'ajoute:
+
+![ancien](readme-file/ancien.png)
+
+![nouveau](readme-file/new.png)
+
+Nouveau User
+
+```javascript
+{
+  "firstname": "Pavid",
+  "lastname": "Pessa",
+  "email": "twP@gmail.com",
+  "password": "1234"
+}
+```
+Voici le resultat:
+
+```javascript
+{
+  "status": "succès",
+  "data": {
+    "firstname": "Pavid",
+    "lastname": "Pessa",
+    "email": "twP@gmail.com",
+    "profilePhoto": "default.jpg",
+    "password": "1234",
+    "postoCunt": 0,
+    "isBlocked": false,
+    "isAdmin": false,
+    "viewBy": [],
+    "followers": [],
+    "following": [],
+    "active": true,
+    "posts": [],
+    "_id": "6655ed34178c5bc2f7c1bd63",
+    "createdAt": "2024-05-28T14:41:56.746Z",
+    "updatedAt": "2024-05-28T14:41:56.746Z",
+    "__v": 0
+  }
+}
+```
+
+Nous allons passer au login
+
+```javascript
+const userLoginCtrl = async(req, res) => {
+    const { email, password } = req.body;
+    try{
+        // check id email exist
+        const userFound = await User.findOne({ email });
+        if (!userFound) {
+            return res.json({
+                status: 'fail',
+                message: 'Wrong email'
+            });
+        }
+
+        // validate password
+        const isPasswordValid = await User.findOne({ password });
+        if (!isPasswordValid) {
+            return res.json({
+                status: 'fail',
+                message: 'Wrong password'
+            });
+        }
+        
+        res.json({
+            status: 'success',
+            message: 'User login successfully'
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+};
 ```
 
 ```javascript
+{
+  "email": "twP@gmail.com",
+  "password": "1234"
+}
 ```
 
 ```javascript
+{
+  "status": "success",
+  "message": "User login successfully"
+}
 ```
+
+Si l'email etait incorrect
 ```javascript
+{
+  "email": "twy@gmail.com",
+  "password": "1234"
+}
 ```
 
 ```javascript
+{
+  "status": "fail",
+  "message": "Wrong email"
+}
 ```
+
+et ceux de meme pour le password
+
+### Cryptage de mot de passe
 ```javascript
+        // Hacher le mot de passe
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Créer un nouvel utilisateur
+        const user = await User.create({
+            firstname,
+            lastname,
+            email,
+            password: hashedPassword
+        });
 ```
 
 ```javascript
-```
-```javascript
+
+{
+  "firstname": "Pavi",
+  "lastname": "Pess",
+  "email": "toP@gmail.com",
+  "password": "1234"
+}
 ```
 
 ```javascript
+
+{
+  "status": "succès",
+  "data": {
+    "firstname": "Pavi",
+    "lastname": "Pess",
+    "email": "toP@gmail.com",
+    "profilePhoto": "default.jpg",
+    "password": "$2b$10$DSlK2nVFubHuAXfKzYkuzOry5Z48OTKimnrdcEGtWlt0M09Dx4L82",
+    "postoCunt": 0,
+    "isBlocked": false,
+    "isAdmin": false,
+    "viewBy": [],
+    "followers": [],
+    "following": [],
+    "active": true,
+    "posts": [],
+    "_id": "6655f579bff6496eb806d5de",
+    "createdAt": "2024-05-28T15:17:13.993Z",
+    "updatedAt": "2024-05-28T15:17:13.993Z",
+    "__v": 0
+  }
+}
 ```
 
 ```javascript
+const userLoginCtrl = async(req, res) => {
+    const { email, password } = req.body;
+    try{
+        // check id email exist
+        const userFound = await User.findOne({ email });
+
+        if(!userFound){
+            return res.json({
+                status: 'fail',
+                message: 'Invalid email or password'
+            });
+        }
+
+        // validate password
+        const isPasswordMatch = await bcrypt.compare(password, userFound.password);
+
+        if(!isPasswordMatch){
+            return res.json({
+                status: 'fail',
+                message: 'Invalid email or password'
+            });
+        }
+        res.json({
+            status: 'success',
+            data: userFound,
+        })
+    } catch(err){
+        res.json({
+            message: err.message
+        })
+    }
+};
 ```
 
 ```javascript
-```
-```javascript
-```
-
-```javascript
-```
-```javascript
+{
+  "email": "toP@gmail.com",
+  "password": "1234"
+}
 ```
 
 ```javascript
+{
+  "status": "success",
+  "data": {
+    "_id": "6655f579bff6496eb806d5de",
+    "firstname": "Pavi",
+    "lastname": "Pess",
+    "email": "toP@gmail.com",
+    "profilePhoto": "default.jpg",
+    "password": "$2b$10$DSlK2nVFubHuAXfKzYkuzOry5Z48OTKimnrdcEGtWlt0M09Dx4L82",
+    "postoCunt": 0,
+    "isBlocked": false,
+    "isAdmin": false,
+    "viewBy": [],
+    "followers": [],
+    "following": [],
+    "active": true,
+    "posts": [],
+    "createdAt": "2024-05-28T15:17:13.993Z",
+    "updatedAt": "2024-05-28T15:17:13.993Z",
+    "__v": 0
+  }
+}
 ```
+
+AU niveau de se code pour permettre d'afficher un seul utilisateur, j'ai ajoute ceci:
+
 ```javascript
+    console.log(req.params)
 ```
 
 ```javascript
+const userGetOneCtrl = async(req, res) => {
+    console.log(req.params)
+    try{
+        res.json({
+            status: 'success',
+            message: 'Profile fetched successfully'
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+}
 ```
+Une fois la requete lance via l'url:
 
 ```javascript
+http://localhost:9000/api/v1/users/profile/1
 ```
 
-```javascript
-```
-```javascript
-```
+Dans le terminal on pourra voir: 
 
 ```javascript
+{ id: '1' }
 ```
-```javascript
-```
+Apportons un peu de modifcation
 
 ```javascript
-```
-```javascript
-```
-
-```javascript
-```
-
-```javascript
-```
-
-```javascript
-```
-```javascript
-```
-
-```javascript
-```
-```javascript
+const userGetOneCtrl = async(req, res) => {
+    const { id } = req.params;
+    try{
+        const user = await User.findById(id);
+        res.json({
+            status: 'success',
+            data: user
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+}
 ```
 
-```javascript
-```
-```javascript
-```
+Comme reponse on aura
+![errorGetOneUser](readme-file/errorGetOneUser.png)
+
+Nous allons maintenant prendre au lient du `/1` un id d'un user que nous avons deja creer c'est a dire au lieu de ceci:
 
 ```javascript
+http://localhost:9000/api/v1/users/profile/1
 ```
 
-```javascript
-```
+nous avons ceci:
+
 
 ```javascript
+http://localhost:9000/api/v1/users/profile/6655f579bff6496eb806d5de
 ```
+
+Et voici le resultat
+
+
+```javascript
+{
+  "status": "success",
+  "data": {
+    "_id": "6655f579bff6496eb806d5de",
+    "firstname": "Pavi",
+    "lastname": "Pess",
+    "email": "toP@gmail.com",
+    "profilePhoto": "default.jpg",
+    "password": "$2b$10$DSlK2nVFubHuAXfKzYkuzOry5Z48OTKimnrdcEGtWlt0M09Dx4L82",
+    "postoCunt": 0,
+    "isBlocked": false,
+    "isAdmin": false,
+    "viewBy": [],
+    "followers": [],
+    "following": [],
+    "active": true,
+    "posts": [],
+    "createdAt": "2024-05-28T15:17:13.993Z",
+    "updatedAt": "2024-05-28T15:17:13.993Z",
+    "__v": 0
+  }
+}
+```
+
+### Json Web Token(JWT)
+
+**Installation**
+```javascript
+npm install jsonwebtoken
+```
+Dans le fichier `utils/generateToken.js`
+
+```javascript
+const jwt = require('jsonwebtoken');
+
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_IN
+    });
+};
+
+module.exports = generateToken;
+```
+
+Dans le userCtrl ajouter ceci
+
+```javascript
+const generateToken = require('../../utils/generateToken');
+```
+
+et a la place du `userFound`
+
+
+```javascript
+res.json({
+    status: 'success',
+    data: userFound,
+})
+```
+
+
+tu vas mettre ceci:
+
+```javascript
+
+res.json({
+    status: 'success',
+    data: {
+        firstname: userFound.firstname,
+        lastname: userFound.lastname,
+        email: userFound.email,
+        isAdmin: userFound.isAdmin,
+        token: generateToken(userFound._id)
+    },
+})
+```
+
+On va maintenant le tester
+
+```javascript
+http://localhost:9000/api/v1/users/login
+
+
+{
+  "email": "toP@gmail.com",
+  "password": "1234"
+}
+```
+
+Reponse
+
+```javascript
+{
+  "status": "success",
+  "data": {
+    "firstname": "Pavi",
+    "lastname": "Pess",
+    "email": "toP@gmail.com",
+    "isAdmin": false,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTVmNTc5YmZmNjQ5NmViODA2ZDVkZSIsImlhdCI6MTcxNjkxNjkxOSwiZXhwIjoxNzE3NTIxNzE5fQ.tRawYkvwPzzioAX01D9H67ojCzPkG4GasdSx6V7iP74"
+  }
+}
+```
+
+
+En prenant ce token et en allant le copier sur le site  [jwt](https://jwt.io/) pour le decoder, vous seriez en mesure de voire certain information
+
+comme ceci: ![Jwtwebsite](readme-file/jwtwebsite.png)
+
+Si vous faite bien attention juste en bas du playload vous devriez etre en mesure de voire l'id du user que nous avons creer
+
+
 ```javascript
 ```
 
