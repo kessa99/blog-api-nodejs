@@ -1991,224 +1991,1191 @@ En prenant ce token et en allant le copier sur le site  [jwt](https://jwt.io/) p
 
 comme ceci: ![Jwtwebsite](readme-file/jwtwebsite.png)
 
-Si vous faite bien attention juste en bas du playload vous devriez etre en mesure de voire l'id du user que nous avons creer
+Si vous faite bien attention juste en bas du playload vous devriez etre en mesure de voire l'id du user que nous avons creer.
 
 
+Nous allons passer a l'ajout d'elements dans l'entete deja ajoutons dans le  code `console.log(req.headers)` qui affichera les elements du parametre. 
+
+
+```javascript
+
+// get one user(Profile)
+const userGetOneCtrl = async(req, res) => {
+    console.log(req.headers);
+    const { id } = req.params;
+    try{
+        const user = await User.findById(id);
+        res.json({
+            status: 'success',
+            data: user
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+}
+```
+
+![header_print](readme-file/headers_print.png)
+
+Comme vous pouvez le voir, les elements dans le header s'affiche, La question est de savoir comment y inserer le token car c'est effectivements labas qu'il doit etre:
+
+```javascript
+[nodemon] starting `node server.js`
+Server is running on port 9000
+la base de donneé est connecté avec succés
+{
+  'accept-encoding': 'gzip, deflate, br',
+  accept: '*/*',
+  'user-agent': 'Thunder Client (https://www.thunderclient.com)',
+  host: 'localhost:9000',
+  connection: 'close'
+}
+```
+
+Pour se faire nous allons ajouter une option Authorization comme ceci dans les config du header
+
+`Authorization Baerer eyJhbGci...`
+
+Voici en photo comment cela va se presenter
+
+![add_auth](readme-file/add_auth.png)
+
+Vous pouvez ainsi voire que dans la console le token y est bien visible. Etant donne cette information nous allons essayer de recuperer le token du header, commencons en ajoutans ce code dans le try
+
+```javascript
+    // get user from header
+    const headerObj = req.headers;
+
+    const token = headerObj.authorization
+
+    console.log(token);
+```
+
+Reponse quand on va lancer le test:
+
+```javascript
+Baerer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTVmNTc5YmZmNjQ5NmViODA2ZDVkZSIsImlhdCI6MTcxNjk0MzQxMSwiZXhwIjoxNzE3NTQ4MjExfQ.An4MXeT-4P1tzvemI3spKfhM0-jRdu6QDJWf-qh2Kjc
+```
+
+Mais ici il y a le `Baerer` qui est montre, nous ce qui nous interesse c'est tout simplement le token donc nous allons encore modifier le code. `split(' ')[1]` comme ceci.
+```javascript
+    const token = headerObj.authorization.split(' ')[1];
+```
+
+Essayons a nouveau
+
 ```javascript
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTVmNTc5YmZmNjQ5NmViODA2ZDVkZSIsImlhdCI6MTcxNjk0MzQxMSwiZXhwIjoxNzE3NTQ4MjExfQ.An4MXeT-4P1tzvemI3spKfhM0-jRdu6QDJWf-qh2Kjc
 ```
+On peut encore ameliorer ce code par ceci:
 
 ```javascript
+const token = headerObj['authorization'].split(' ')[1];
 ```
+
+Voici le code complet:
+
 ```javascript
+// get one user(Profile)
+const userGetOneCtrl = async(req, res) => {
+    const { id } = req.params;
+    try{
+        // get user from header
+        const headerObj = req.headers;
+        const token = headerObj['authorization'].split(' ')[1];
+        console.log(token);
+
+        const user = await User.findById(id);
+        res.json({
+            status: 'success',
+            data: user
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+}
 ```
+
+Nous vous en faite pas il donnera le meme code. Nous allons maintenant creer une fonction qui permettra de checker le token avant chaque element. Par exemple si vous voulez faire un post il faut checker le token, faire un commentaire checker le token ...
+
+donc dans `utils` nous allons creer `getTokenFromHeaders.js`
+
+Dans ce fichier, nous allons juste recuperer l'ancien code et faire en sorte de l'ameliorer un peu come ceci:
+
 
 ```javascript
+const getTokenFromHeader = req => {
+    const headerObj = req.headers;
+    const token = headerObj['authorization'].split(' ')[1];
+
+    if (token !== undefined) {
+        return token;
+    } else {
+        return {
+            status: 'fail',
+            message: 'There is no token in the header'
+        };
+    }
+};
+
+module.exports = getTokenFromHeader;
 ```
+
+Et dans le userCtrl.js ou nous avons enlever l'ancien code, nous allons mettre
+
 ```javascript
+    // get user from header
+    const token = getTokenFromHeader(req);
+    console.log(token);
 ```
+Quand on le test, voici le resultat
 
 ```javascript
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTVmNTc5YmZmNjQ5NmViODA2ZDVkZSIsImlhdCI6MTcxNjk0MzQxMSwiZXhwIjoxNzE3NTQ4MjExfQ.An4MXeT-4P1tzvemI3spKfhM0-jRdu6QDJWf-qh2Kjc
 ```
 
+voici a quoi va ressmbler le nouveau userCtrl.js
 
 ```javascript
+// get one user(Profile)
+const userGetOneCtrl = async(req, res) => {
+    const { id } = req.params;
+    try{
+        // get user from header
+        const token = getTokenFromHeader(req);
+        console.log(token);
+
+        const user = await User.findById(id);
+        res.json({
+            status: 'success',
+            data: user
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+}
+```
+Si le token n'a pas ete mis dans le header un message d'erreur sera ramener:
+
+```javascript
+{ status: 'fail', message: 'There is no token in the header' }
 ```
+
 
+La prochaine etape consistera a checker via la creation d'un middleware si le token est bien present dans le header ou donner acces a l'utilisateur qui possede le bon token
+
+Pour se faire on va dans le fichier `middleware` ou on va creer un fichier `isLogin.js`. Pour faire simple voici comment va se presenter cette partie
+
+
 ```javascript
+const isLogin = (req, res, next) => {
+    // get token from header
+    //verify the token
+    //save the user data in req.user
+}
 ```
+
+Voici le code complet pour une premiere partie
+
 ```javascript
+const getTokenFromHeader = require('../utils/getTokenFromHeaders');
+
+const isLogin = (req, res, next) => {
+    // get token from header
+    const token = getTokenFromHeader(req);
+    if (!token) {
+        return res.json({
+            message: 'there is no token in the header'
+        });
+    } else {
+        next();
+    }
+    //verify the token
+    //save the user data in req.user
+};
+
+module.exports = isLogin;
 ```
 
+on va dans les routes c'est a dire le `userRoutes.js` ou nous allons d'abord importer ceci:
+
 ```javascript
+const isLogin = require('../../middlewares/isLogin');
+
 ```
+
+Puis par la suite, 
+
 ```javascript
+//GET/api/v1/users/:id
+userRouter.get('/profile/:id', isLogin, userGetOneCtrl);
 ```
+qui etait au paraavant que ceci
 
 ```javascript
+//GET/api/v1/users/:id
+userRouter.get('/profile/:id', userGetOneCtrl);
 ```
+
+En effet pour checker un user, il faut avoir un token donc on va d'abord s'assurer que le isLogin est en place en verifiant son token si c'est bon, la fonction next permettra de passer au `userGetOneCtrl` pour avoir le user en question. Bien passons au test si tout est claire. Normalement tout devrait etre bon
+
+![add_auth](readme-file/add_auth.png)
+
+Petite modification, au niveau du `getTokenFromHeaders.js`
+
 ```javascript
+const getTokenFromHeader = req => {
+    const headerObj = req.headers;
+    const token = headerObj['authorization'].split(' ')[1];
+
+    if (token !== undefined) {
+        return token;
+    } else {
+        return false;
+    }
+};
+
+module.exports = getTokenFromHeader;
 ```
+
+en cas d'erreur(c'est a dire si il n'y a aucun token) vous aurez cette reponse
 
 ```javascript
+{
+  "message": "there is no token in the header"
+}
 ```
 
+Maintenant un probleme qui s'il n'est pas resolu pourra nous creer d'inonbrable probleme. J'ai supprimer le token generer et placer au niveau du Baerer. A la plce je vais un tken saisi au hasard sur mon clavier un peu comme ceci
+
 ```javascript
+Baerer jkahfuiahfiuaeeiufe
 ```
+
+Fort est de constater que cela me donnera une reponse valide
+
+vous pouvez le voir ici:
+
+![tokenValidError](readme-file/error_token_valid.png)
+
+Il faut donc travailler cela sinon tout ne code ne servira pas a grand chose. Nous allons donc creer une fonction de verification que l'on va nommer `verifyToken.js`
 
+voici le code:
+
 ```javascript
+const jwt = require('jsonwebtoken');
+
+const verifyToken = token => {
+    return jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return false;
+        } else {
+            return decoded;
+        }
+    });
+};
+
+module.exports = verifyToken;
 ```
+
+en modifiant aussi le `isLogin.js` On aura
+
 ```javascript
+const getTokenFromHeader = require('../utils/getTokenFromHeaders');
+const verifyToken = require('../utils/verifyToken');
+
+const isLogin = (req, res, next) => {
+    // get token from header
+    const token = getTokenFromHeader(req);
+
+    //verify the token
+    const decodedUser = verifyToken(token);
+
+    if (!decodedUser) {
+        return res.json({
+            message: 'Invalid token/expired. Please login again.'
+        });
+    } else {
+        next();
+    }
+
+
+    //save the user data in req.user
+};
+
+module.exports = isLogin;
 ```
+
+Nous pouvons maintenant tester avec le faux token creer, normalement nous devrions avoir ceci:
+
+![verify_token](readme-file/verify_token_1.png)
+
+connectez vous via le login pour generer un nouveau token puis tester vous verrez au'a se niveau notre systeme est beaucoup plus sur.
 
+La troisieme partie consiste a sauvegarder le user dans isLogin.js nous allons mettre
+
 ```javascript
+//save the user data in req.user
+req.userAuth = decodedUser.id;
 ```
+voici le code complet
+
 ```javascript
+const getTokenFromHeader = require('../utils/getTokenFromHeaders');
+const verifyToken = require('../utils/verifyToken');
+
+const isLogin = (req, res, next) => {
+    // get token from header
+    const token = getTokenFromHeader(req);
+
+    //verify the token
+    const decodedUser = verifyToken(token);
+
+    //save the user data in req.user
+    req.userAuth = decodedUser.id;
+
+    if (!decodedUser) {
+        return res.json({
+            message: 'Invalid token/expired. Please login again.'
+        });
+    } else {
+        next();
+    }
+};
+
+module.exports = isLogin;
 ```
+ensuite dans le `userCtrl.js` Nous allons mettre 
 
 ```javascript
+console.log(req.userAuth)
 ```
+
+toujours en dehors du try. En testant cela nous affichera l'id
+
 ```javascript
+[nodemon] restarting due to changes...
+[nodemon] starting `node server.js`
+Server is running on port 9000
+la base de donneé est connecté avec succés
+6655f579bff6496eb806d5de
 ```
 
+Nous pouvons ainsi faire ces modifications dans le `userCtrl.js`
+
 ```javascript
+// get one user(Profile)
+const userGetOneCtrl = async(req, res) => {
+    try{
+        const user = await User.findById(req.userAuth);
+        res.json({
+            status: 'success',
+            data: user
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+}
+
 ```
 
+Dans le userRouter, on peut ainsi se permettre de faire ceci
+
 ```javascript
+//GET/api/v1/users/:id
+userRouter.get('/profile/', isLogin, userGetOneCtrl);
 ```
+
+en elevant l'id dans l'url c'est a dire comme ceci
 
 ```javascript
+http://localhost:9000/api/v1/users/profile/
 ```
+
+et en la testant effectivement on peut avoir le meme resultat comme ceci:
+
+![verify_token](readme-file/loginwithout.png)
+
+Avec cela tout semble ok, nous pouvons ainsi passer a autre chose comme les
+
+### Error handling
+
+
+La gestion des erreurs (Error handling) est une pratique fondamentale en développement logiciel qui consiste à anticiper, détecter et gérer les erreurs qui peuvent survenir pendant l'exécution d'un programme. Une bonne gestion des erreurs améliore la robustesse et la fiabilité du code, et offre une meilleure expérience utilisateur en fournissant des messages d'erreur utiles et des moyens de récupérer des erreurs lorsqu'elles surviennent.
+
+#### Concepts Clés de la Gestion des Erreurs
+
+1. **Détection des Erreurs** :
+   - **Exceptions** : Utiliser des exceptions pour signaler des erreurs. En JavaScript, cela se fait généralement avec `throw`.
+   - **Codes de Retour** : Utiliser des valeurs de retour spécifiques pour indiquer des erreurs (moins courant dans les langages modernes, mais toujours utilisé).
+
+2. **Gestion des Erreurs** :
+   - **Blocs `try...catch`** : Capturer et gérer les exceptions.
+   - **Blocs `try...catch...finally`** : Capturer les exceptions et exécuter du code de nettoyage.
+   - **Middleware d'Erreur** : Dans les frameworks comme Express.js, utiliser des middleware spécifiques pour gérer les erreurs.
+
+3. **Propagation des Erreurs** :
+   - **Relancer des Erreurs** : Relancer les exceptions pour les gérer à un niveau supérieur dans l'application.
+   - **Propager les Erreurs** : Passer les erreurs aux gestionnaires d'erreurs appropriés.
+
+4. **Logging et Surveillance** :
+   - **Journalisation des Erreurs** : Enregistrer les erreurs pour une analyse ultérieure.
+   - **Surveillance** : Utiliser des outils de surveillance pour détecter et alerter les erreurs en temps réel.
+
+#### Exemples de Gestion des Erreurs en JavaScript
+
+##### 1. Bloc `try...catch`
+
 ```javascript
+try {
+    // Code susceptible de produire une erreur
+    let result = riskyOperation();
+    console.log(result);
+} catch (error) {
+    // Gestion de l'erreur
+    console.error('Une erreur est survenue:', error.message);
+}
 ```
+
+##### 2. Bloc `try...catch...finally`
 
 ```javascript
+try {
+    // Code susceptible de produire une erreur
+    let result = riskyOperation();
+    console.log(result);
+} catch (error) {
+    // Gestion de l'erreur
+    console.error('Une erreur est survenue:', error.message);
+} finally {
+    // Code de nettoyage
+    console.log('Nettoyage en cours...');
+}
 ```
+
+##### 3. Middleware de Gestion des Erreurs dans Express.js
+
 ```javascript
+const express = require('express');
+const app = express();
+
+// Route normale
+app.get('/', (req, res) => {
+    throw new Error('Erreur intentionnelle');
+});
+
+// Middleware de gestion des erreurs
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Quelque chose a mal tourné!' });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Serveur en écoute sur le port ${PORT}`);
+});
 ```
+
+#### Meilleures Pratiques en Gestion des Erreurs
+
+1. **Spécifique et Descriptive** :
+   - Utilisez des messages d'erreur descriptifs pour faciliter le débogage.
+   - Différenciez les types d'erreurs (par exemple, erreurs de validation, erreurs de serveur, erreurs de réseau).
+
+2. **Ne Pas Exposer les Détails Internes** :
+   - Ne divulguez pas de détails internes du serveur ou de l'application dans les messages d'erreur renvoyés aux utilisateurs finaux.
+
+3. **Nettoyage Approprié** :
+   - Assurez-vous que les ressources (comme les fichiers et les connexions réseau) sont correctement fermées dans le bloc `finally` ou en utilisant des mécanismes de gestion des ressources.
 
+4. **Surveillance Continue** :
+   - Utilisez des outils de monitoring et de logging pour surveiller les erreurs en production.
+
+5. **Récupération Gracieuse** :
+   - Fournissez des mécanismes pour que les utilisateurs puissent récupérer des erreurs sans perdre leur travail, par exemple en sauvegardant périodiquement l'état de l'application.
+
+La gestion efficace des erreurs est cruciale pour construire des applications robustes et fiables, et pour offrir une bonne expérience utilisateur.
+
+
+Si nous revenons dans notre fichier server.js nous pouvons ainsi voir que que nous avions reserver une place pour cette section
+
 ```javascript
+// import express
+const express = require('express');
+
+//import mongoose
+const mongoose = require('mongoose');
+
+//import dotenv
+const dotenv = require('dotenv');
+
+//import routes
+const userRouter = require('./routes/users/userRoutes');
+const postRouter = require('./routes/posts/postRouter');
+const commentRouter = require('./routes/comment/commentRouter');
+const categoryRouter = require('./routes/category/categoryRouter');
+
+
+dotenv.config();
+require('./config/dbConnect');
+const app = express();
+
+// middleware
+
+app.use(express.json());
+const userAuth = {
+    isLogin: true,
+    isAdmin: false,
+}
+
+app.use((req, res, next) => {
+    if (userAuth.isLogin) {
+        next();
+    } else {
+        res.json({
+            message: 'You are not login'
+        });
+    }
+});
+
+
+
+// ROUTES
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/posts/', postRouter);
+app.use('/api/v1/comments/', commentRouter);
+app.use('/api/v1/category/', categoryRouter);
+
+//Error handlers middelware
+
+
+//listen server
+const PORT = process.env.PORT || 9000;
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 ```
+
+Dans un premier temps il s'agira de mettre en place ce petit code
+
 ```javascript
+//Error handlers middelware
+app.use((err, req, res, next) => {
+   console.log(err.message) 
+});
 ```
+
+Cela permettra de voir les erreurs des messages lies aux donnes saisie ou pas saisie par le client. COmme exemple nous allons refaire un enregistrement avec 
 
 ```javascript
+{
+
+  "lastname": "Tiya",
+  "email": "tiya@gmail.com",
+  "password": "1234"
+}
 ```
+
+J'ai sciemment omis le firstname. Rappelez vous dans notre model, les champs:
+- firstname
+- lastname
+- email
+- password
 
+on un truc en commun:
+
 ```javascript
+    firstname: {
+        type: String,
+        required:[true, 'First name is required']
+    },
+    lastname: {
+        type: String,
+        required:[true, 'Last name is required']
+    },
+    email: {
+        type: String,
+        required:[true, 'Email is required']
+    },
+    profilePhoto: {
+        type: String,
+        default: 'default.jpg'
+    },
+    password: {
+        type: String,
+        required:[true, 'Password is required']
+    }
 ```
+
+Il sont tous des champs obligatoire en locurrence: `is require`
+Donc quand je lance le code sans le firstname on a comme erreur: 
+
 
 ```javascript
+{
+  "message": "User validation failed: firstname: First name is required"
+}
 ```
+
+La prochaine etape consiste a mettre dans fichier `controllers/userCtrl.js` et plus precisement dans la fonction `userRegisterCtrl` nous allons ajouter le `next` dans les paramettre. Un peu comme ceci:
+
+
 ```javascript
+const userRegisterCtrl = async (req, res, next)
 ```
+ 
+Puis au niveau du catch(error) nous allons avoir
 
 ```javascript
+catch (err) {
+        console.log('Errr occurred:', err.message);
+        return res.json({
+            message: err.message
+        });
+    }
 ```
+
+puis le remplacer par ceci:
+
+
 ```javascript
+catch (err) {
+        next(err.message);
+    }
 ```
+
+Quand on va tester, on va voir qu'au niveau de l'affichage voici comment cela va fonctionner
+
+![error](readme-file/erroHan_1.png)
+
+On remarque aussi que l'erreur s'affichera dans le terminal.
 
+Bien, Passons a la suite. Voici un peu la structure
+
 ```javascript
+//Error handlers middelware
+app.use((err, req, res, next) => {
+    // status
+    // message
+    // stack
+    console.log(err.stack)
+});
 ```
+
+Developper le stack(c'est quoi?) Mais ici nous pouvons voir que 
+
 ```javascript
+Server is running on port 9000
+la base de donneé est connecté avec succés
+undefined
+
 ```
+l'affichage du `undefined`
 
+dans le `userCtrl.js` dans la partie error qui etait comme ceci:
+
 ```javascript
+catch (err) {
+        next(err.message);
+    }
 ```
+Elle deviendra comme ceci
 
 ```javascript
+catch (err) {
+    next(new Error(err.message));
+}
 ```
+
+Dans le test, nous allons pouvoir ainsi voir dasn le terminal
 
 ```javascript
+[nodemon] restarting due to changes...
+[nodemon] starting `node server.js`
+Server is running on port 9000
+la base de donneé est connecté avec succés
+Error: User validation failed: firstname: First name is required
+    at userRegisterCtrl (/home/titodevops/Bureau/Boulot/blog-api-nodejs/controllers/users/userCtrl.js:42:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
 ```
+Avec ceci nous pouvons voir avec precisions l'erreur et ainsi permetrre de la gerer. Pour la prochaine section, nous allons devoir ajouter des elements dans le `server.js`
+
 ```javascript
+
+//Error handlers middelware
+app.use((err, req, res, next) => {
+    // status
+    // message
+    // stack
+    const stack = err.stack;
+    const message = err.message;
+    const status = err.status ? err.status : 'failed';
+    const statusCode = err?.statusCode ? err.statusCode : 500;
+    res.status(statusCode).json({
+        stack,
+        status,
+        message,
+    });
+});
 ```
 
+comme reponse nous aurons:
+
 ```javascript
+{
+  "stack": "Error: User validation failed: firstname: First name is required\n    at userRegisterCtrl (/home/titodevops/Bureau/Boulot/blog-api-nodejs/controllers/users/userCtrl.js:42:14)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
+
+  "status": "failed",
+
+  "message": "User validation failed: firstname: First name is required"
+}
 ```
+
+Dons pour definir le stack:
+
+**Utilité de la Trace de la Pile**
+* Débogage : Identifier où l'erreur s'est produite et comprendre la chaîne d'appels qui y a conduit.
+
+* Analyse des Problèmes : Comprendre les dépendances et le flux d'exécution dans le code, ce qui est crucial pour résoudre des bugs complexes.
+
+* Documentation des Erreurs : Fournir des informations détaillées sur les erreurs dans les journaux ou les rapports d'erreurs, ce qui facilite la maintenance et l'amélioration du code.
+
+Nous allons maintenant nous attaquer a la partie dans le `userCtrl/userRegisterCtrl` au niveau du check de l'email.
+
 ```javascript
+    // Vérifier si l'utilisateur existe déjà
+    const userFound = await User.findOne({ email });
+    if (userFound) {
+        return res.json({
+            msg: 'User already exists'
+        });
+    }
 ```
+Nous allons le transformer en ceci
 
 ```javascript
+    // Vérifier si l'utilisateur existe déjà
+    const userFound = await User.findOne({ email });
+    if (userFound) {
+        return next(new Error('User alreadyexists'));
+    }
 ```
+
+Ok, maintenant nous allons remettre le firstname et tester pur voir 
+
 ```javascript
+{
+  "firstname": "Pavi",
+  "lastname": "Pess",
+  "email": "toP@gmail.com",
+  "password": "1234"
+}
 ```
 
 ```javascript
+{
+  "stack": "Error: User already exists\n    at userRegisterCtrl (/home/titodevops/Bureau/Boulot/blog-api-nodejs/controllers/users/userCtrl.js:19:21)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
+  "status": "failed",
+  "message": "User already exists"
+}
 ```
 
+Bien nous allons maintenant essayer d'arranger tout ceci en creant le fichier `globalErrorHandler.js` le mettre dans un middleware predefini dans le fichier `middlewares/globalErrorHandler.js`
+
 ```javascript
+
+const globalErrorHandler = (err, req, res, next) => {
+    // status
+    // message
+    // stack
+    const stack = err.stack;
+    const message = err.message;
+    const status = err.status ? err.status : 'failed';
+    const statusCode = err?.statusCode ? err.statusCode : 500;
+    res.status(statusCode).json({
+        stack,
+        status,
+        message,
+    });
+};
+
+module.exports = globalErrorHandler;
 ```
+
+dans server je vais l'importer comme ceci:
 
 ```javascript
+const globalErrorHandler = require('./middlewares/globalErrorHandler');
 ```
+et l'utiliser comme ceci
+
 ```javascript
+//Error handlers middelware
+app.use(globalErrorHandler);
 ```
+Normalement si vous le tester tout passera bien normalement
+
+## APP ERROR FUNCTION
+
+Dans `utils`, nous allons creer le fichier `appErr.js` et voici les premier elements de ce code:
 
 ```javascript
+// app error
+const appErr = (message, statusCode) => {
+    let err = new Error(message);
+    err.statusCode = statusCode ? statusCode : 500;
+    err.stack = err.stack;
+    return err;
+}
+
+module.exports = appErr;
 ```
+
+Dans le `userCtrl` nous allons l'importer et l'y utiliser. Voici l'ancien que normalement vous devriez avoir
+
 ```javascript
+    // Vérifier si l'utilisateur existe déjà
+    const userFound = await User.findOne({ email });
+    if (userFound) {
+        return next(new Error('User alreadyexists'));
+    }
 ```
+Voici sa mise a jour
 
 ```javascript
+    // Vérifier si l'utilisateur existe déjà
+    const userFound = await User.findOne({ email });
+    if (userFound) {
+        return next(appErr('User already exists', 404));
+    }
 ```
+Comme a l'accoutume pour verifier si le code est correct n'hesitez pas a le tester c'est meme conseiller. De mon cote tout est bon.
+
+Dans le meme fichier, je vais creer une classe comme ceci
+
 ```javascript
+// app error
+const appErr = (message, statusCode) => {
+    let err = new Error(message);
+    err.statusCode = statusCode ? statusCode : 500;
+    err.stack = err.stack;
+    return err;
+}
+
+// Err class
+class AppErr extends Error {
+    constructor(message, statusCode) {
+        super(message);
+        this.statusCode = statusCode ? statusCode : 500;
+        this.status = 'failed'
+        this.stack = this.stack;
+    }
+}
+
+module.exports = { appErr, AppErr };
 ```
 
+dans `userCtrl.js` je vais l'importer
+
 ```javascript
+const { appErr, AppErr } = require('../../utils/appErr');
 ```
+
+Je peux ainsi l'utiliser
 
 ```javascript
+// Vérifier si l'utilisateur existe déjà
+const userFound = await User.findOne({ email });
+if (userFound) {
+    return next(new AppErr('User already exists', 404));
+}
 ```
 
+Puis le test. Normalement oujours el meme message devrait s'afficher a savoir:
+
+![error](readme-file/Erro_app_2.png)
+
+Nous allons aussi faire des modifications dans le `isLogin.js`. Ceci est l'ancien code
+
 ```javascript
+    if (!decodedUser) {
+        return res.json({
+            message: 'Invalid token/expired. Please login again.'
+        });
+    }
 ```
+
+Grace a cela si il y a une erreur ou une faute dans le token le message suivant devrait apparaitre via cette url. Notons que j'ai intentionnellement retirer cetains caractere du token mis dans le header au niveau du Baerer
+
 ```javascript
+http://localhost:9000/api/v1/users/profile/
 ```
 
 ```javascript
+{
+  "stack": "Error: Invalid/Expired token. Please login again\n    at appErr (/home/titodevops/Bureau/Boulot/blog-api-nodejs/utils/appErr.js:3:15)\n    at isLogin (/home/titodevops/Bureau/Boulot/blog-api-nodejs/middlewares/isLogin.js:16:21)\n    at Layer.handle [as handle_request] (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/express/lib/router/layer.js:95:5)\n    at next (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/express/lib/router/route.js:149:13)\n    at Route.dispatch (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/express/lib/router/route.js:119:3)\n    at Layer.handle [as handle_request] (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/express/lib/router/layer.js:95:5)\n    at /home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/express/lib/router/index.js:284:15\n    at Function.process_params (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/express/lib/router/index.js:346:12)\n    at next (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/express/lib/router/index.js:280:10)\n    at Function.handle (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/express/lib/router/index.js:175:3)",
+  "status": "failed",
+  "message": "Invalid/Expired token. Please login again"
+}
 ```
+
+## FILE UPLOAD
+
+Dans le fichier du server.js, je vais ajouter ceci:
+
 ```javascript
+// 404 error
+app.use('*', (req, res) => {
+    res.status(404).json({
+        message: '404 Route Not Found'
+    });
+});
 ```
 
+Puis dans l'url je vais mettre n'importe quoi apres le profile
 ```javascript
+http://localhost:9000/api/v1/users/profile/sfgfvdf
 ```
+
+En lancant le test j'aurai ceci:
+
 ```javascript
+{
+  "message": "404 Route Not Found"
+}
 ```
+
+Je vais aussi ajouter un console.log qui me permettra d'afficher l'url qui est a l'origine du probleme
 
 ```javascript
+console.log(req.originalUrl)
 ```
 
 ```javascript
+// 404 error
+app.use('*', (req, res) => {
+    console.log(req.originalUrl)
+    res.status(404).json({
+        message: '404 Route Not Found'
+    });
+});
 ```
+Reponse:
 
 ```javascript
+[nodemon] restarting due to changes...
+[nodemon] starting `node server.js`
+Server is running on port 9000
+la base de donneé est connecté avec succés
+/api/v1/users/profile/sfgfvdf
 ```
+
+Pour rendre le code plus optimal voila ce que je propose:
+
 ```javascript
+// 404 error
+app.use('*', (req, res) => {
+    res.status(404).json({
+        message: `${req.originalUrl} - 404 Route Not Found`
+    });
+});
 ```
+et voici la reponse:
 
 ```javascript
+{
+  "message": "/api/v1/users/profile/sfgfvdf - 404 Route Not Found"
+}
 ```
+
+## USER MODEL MODIFIED
+
+Dans le model post, nous allons nous mettre a jour le model user
+
 ```javascript
+plan: {
+    type: String,
+    enum: ['free', 'Premium', 'Pro']
+    default: free
+},
+userAwartd: {
+    type: String,
+    enum: ['Gold', 'Silver', 'Bronze'],
+    defaut: 'Bronze'
+}
 ```
+Nous allons passer a l'utilisation du `cloudinary`
+
+**What is THAT? CLOUDINARY**
+Cloudinary est une plateforme de gestion de médias en nuage (cloud) qui permet aux développeurs et aux entreprises de stocker, manipuler, optimiser et diffuser des fichiers multimédias (images, vidéos, etc.) de manière efficace et évolutive. 
+
 
+Installation cloudninary
 ```javascript
+npm install cloudinary
 ```
+
+Multer est un middleware pour Express et Node. js qui facilite la gestion des données multipart/form, utilisées pour le téléchargement de fichiers.
+
 ```javascript
+npm install --save multer
 ```
 
 ```javascript
+npm install multer-storage-cloudinary
 ```
+Allez sur le site pour vous creer un compte et ainsi obtenir vos api qui seront dans le .env
 
+[Cloudinary.com](https://cloudinary.com/)
+
+dans votre `.env` mettre vos elements et les noms que vous obtiendrez
+
 ```javascript
+CLOUDINARY_CLOUD_NAME=***************
+CLOUDINARY_API_KEY=*************
+CLOUDINARY_API_SECRET_KEY=*************
+CLOUDINARY_URL=cloudinary://*****************
 ```
+
+ON va dans le fichier config ou l'on va creer un fichier `cloudinary.js`
+
+Voici ceux que contient le fichier `cloudinary.js`
+
 ```javascript
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+// configure cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET_KEY
+});
+
+//instance of Cloudinary Storage
+const storage = new CloudinaryStorage({
+    cloudinary,
+    allowedFormats: ['jpeg', 'png', 'jpg'],
+    params: {
+        folder: 'blog-api',
+        transformation: [{ width: 500, height: 500, crop: 'limit' }],
+    }
+});
+
+module.exports = {
+    cloudinary,
+    storage
+};
 ```
 
+
+Je vais maintenant dans le fichier `userCtrl.js` Pour l'importer et ainsi faire le travail
+
+
 ```javascript
+const { cloudinary, storage } = require('../../config/cloudinary');
+
 ```
+Une fois l'importation faite, on va creer un nouveau controllers `profilePhototoUploadCtrl`
+
 ```javascript
+// Profile photo Upload
+const profilePhototoUploadCtrl = async(req, res) => {
+    try{
+        res.json({
+            status: 'success',
+            data: 'Profile photo uploaded successfully'
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+};
 ```
 
+ensuite une nouvelle route
 ```javascript
+//POST/api/v1/users/profile-photo-upload
+userRouter.post('/profile-photo-upload', profilePhototoUploadCtrl);
 ```
+Nous pouvons maintenant tester tout cela
+via l'url:
+
 ```javascript
+http://localhost:9000/api/v1/users/profile-photo-upload
 ```
 
+et la reponse
+
 ```javascript
+{
+  "status": "success",
+  "data": "Profile photo uploaded successfully"
+}
 ```
+
+Allons maintenant voir ce que cela donne une fois que nous ajoutons une image dans tout ceci:
+
+![cloudinary](readme-file/cloudinary_1.png)
 
+en ajouter un petit `console.log(req.file)` avant le try on verra donc ce que cela pourra donner comme reponse
+
+il sera afficher un `undefined`. Voyons comment regler cela. Tout d'abord allons dans le `userRoutes.js`
+
 ```javascript
+const storage = require('../../config/cloudinary');
+const multer = require('multer');
 ```
 
+Par la suite
+
 ```javascript
+// instance of multer
+const upload = multer({ storage })
 ```
+
+ensuite
+
 ```javascript
+//POST/api/v1/users/profile-photo-upload
+userRouter.post('/profile-photo-upload', upload.single('profile'), profilePhototoUploadCtrl);
 ```
+
+En testant vous obtiendrez surement cette erreur
 
 ```javascript
+{
+  "stack": "MulterError: Unexpected field\n    at wrappedFileFilter (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/multer/index.js:40:19)\n    at Multipart.<anonymous> (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/multer/lib/make-middleware.js:107:7)\n    at Multipart.emit (node:events:519:28)\n    at HeaderParser.cb (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/busboy/lib/types/multipart.js:358:14)\n    at HeaderParser.push (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/busboy/lib/types/multipart.js:162:20)\n    at SBMH.ssCb [as _cb] (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/busboy/lib/types/multipart.js:394:37)\n    at feed (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/streamsearch/lib/sbmh.js:200:10)\n    at SBMH.push (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/streamsearch/lib/sbmh.js:104:16)\n    at Multipart._write (/home/titodevops/Bureau/Boulot/blog-api-nodejs/node_modules/busboy/lib/types/multipart.js:567:19)\n    at writeOrBuffer (node:internal/streams/writable:564:12)",
+  "status": "failed",
+  "message": "Unexpected field"
+}
 ```
+
+Un petit zoom sur ceci
+
 ```javascript
+userRouter.post('/profile-photo-upload', upload.single('profile'), profilePhototoUploadCtrl);
 ```
+On remarque le `profile` au niveau du `upload.single('profile)`. Nous allons ainsi le mettre en en ![cloudinary](readme-file/cloudinary_1.png)
+
+je l'ai ajouter au niveau du file
+[cloudinary](readme-file/clodify_2.png)
 
 ```javascript
 ```
@@ -4198,27 +5165,71 @@ Si vous faite bien attention juste en bas du playload vous devriez etre en mesur
 ```
 ```javascript
 ```
-
 ```javascript
 ```
-
 ```javascript
 ```
-
 ```javascript
 ```
 ```javascript
 ```
-
 ```javascript
 ```
 ```javascript
 ```
-
 ```javascript
 ```
 ```javascript
 ```
-
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
+```javascript
+```
 ```javascript
 ```

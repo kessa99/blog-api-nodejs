@@ -1,10 +1,13 @@
 const User = require('../../model/User/User'); 
 const bcrypt = require('bcrypt');
 const generateToken = require('../../utils/generateToken');
+const getTokenFromHeader = require('../../utils/getTokenFromHeaders');
+const { appErr, AppErr } = require('../../utils/appErr');
+const storage = require('../../config/cloudinary');
 
 
 // register
-const userRegisterCtrl = async (req, res) => {
+const userRegisterCtrl = async (req, res, next) => {
     const {
         firstname,
         lastname,
@@ -13,13 +16,11 @@ const userRegisterCtrl = async (req, res) => {
     } = req.body;
 
     try {
-        // Vérifier si l'utilisateur existe déjà
-        const userFound = await User.findOne({ email });
-        if (userFound) {
-            return res.json({
-                msg: 'User already exists'
-            });
-        }
+    // Vérifier si l'utilisateur existe déjà
+    const userFound = await User.findOne({ email });
+    if (userFound) {
+        return next(new AppErr('User already exists', 404));
+    }
 
         // Hacher le mot de passe
         const salt = await bcrypt.genSalt(10);
@@ -39,12 +40,10 @@ const userRegisterCtrl = async (req, res) => {
             data: user
         });
     } catch (err) {
-        console.log('Errr occurred:', err.message);
-        return res.json({
-            message: err.message
-        });
+        next(appErr(err.message));
     }
 };
+
 
 // login
 const userLoginCtrl = async(req, res) => {
@@ -87,11 +86,11 @@ const userLoginCtrl = async(req, res) => {
     }
 };
 
+
 // get one user(Profile)
 const userGetOneCtrl = async(req, res) => {
-    const { id } = req.params;
     try{
-        const user = await User.findById(id);
+        const user = await User.findById(req.userAuth);
         res.json({
             status: 'success',
             data: user
@@ -103,6 +102,7 @@ const userGetOneCtrl = async(req, res) => {
         })
     }
 }
+
 
 // get all user
 const userGetAllCtrl = async(req, res) => {
@@ -119,7 +119,6 @@ const userGetAllCtrl = async(req, res) => {
     }
 };
 
-
 // update user
 const updateUserCtrl = async(req, res) => {
     try{
@@ -134,6 +133,23 @@ const updateUserCtrl = async(req, res) => {
         })
     }
 };
+
+// Profile photo Upload
+const profilePhototoUploadCtrl = async(req, res) => {
+    console.log(req.file);
+    try{
+        res.json({
+            status: 'success',
+            data: 'Profile photo uploaded successfully'
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+};
+
 
 // delete user
 const deleteUserCtrl = async(req, res) => {
@@ -166,6 +182,7 @@ const userLogoutCtrl = async(req, res) => {
     }
 }
 
+
 // export
 module.exports = {
     userRegisterCtrl,
@@ -174,5 +191,6 @@ module.exports = {
     userGetAllCtrl,
     updateUserCtrl,
     deleteUserCtrl,
-    userLogoutCtrl
+    userLogoutCtrl,
+    profilePhototoUploadCtrl,
 }

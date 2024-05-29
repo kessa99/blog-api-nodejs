@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 // create a schema
+
+
 const userSchema = new mongoose.Schema({
     firstname: {
         type: String,
@@ -21,7 +23,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required:[true, 'Password is required']
     },
-    postoCunt: {
+    postCount: {
         type: Number,
         default: 0
     },
@@ -35,7 +37,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['Admin', 'Guest', 'Editor', 'user']
+        enum: ['Admin', 'Guest', 'Editor',]
     },
     viewBy: [
         {
@@ -65,6 +67,22 @@ const userSchema = new mongoose.Schema({
             ref: "Post",
         },
     ],
+    blocked: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+    ],
+    plan: {
+        type: String,
+        enum: ['Free', 'Premium', 'Pro'],
+        default: 'Free'
+    },
+    userAward:{
+        type: String,
+        enum: ['Gold', 'Silver', 'Bronze'],
+        default: 'Bronze'
+    }
 },
 {
     timestamps: true
