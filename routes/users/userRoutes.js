@@ -9,7 +9,6 @@ const {
     userLogoutCtrl,
     profilePhototoUploadCtrl,
 } = require('../../controllers/users/userCtrl');
-
 const storage = require('../../config/cloudinary');
 
 const multer = require('multer');
