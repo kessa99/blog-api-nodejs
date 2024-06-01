@@ -82,6 +82,31 @@ const userSchema = new mongoose.Schema({
 }
 
 );
+// HOOKS
+// PRE-BEFORE RECORD IS SAVED
+userSchema.pre('findOne', function(next){
+    // get the user id
+    const userId = this._conditions._id;
+    // find the post create by the user
+    const posts = await Post.find({user: userId});
+    // check if the post is found
+    const lastPost = posts[posts.length - 1];
+    // get the last post date
+    const lastPostDate = new Date(lastPost.createdAt);
+    // get the last post date u string format
+    const lastPostDateString = lastPostDate.toDateString();
+    // add virtuals to the schema
+    userSchema.virtual('lastPost').get(function(){
+        return lastPostDateString;
+    });
+    console.log(lastPostDateString);
+    next();
+});
+// POST -AFTER SAVING
+userSchema.post('save', function(doc, next){
+    console.log('look hook')
+    next();
+});
 
 // GET FULLNAME
 userSchema.virtual('fullname').get(function(){

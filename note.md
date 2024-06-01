@@ -3242,7 +3242,9 @@ j'obtiens alors le resultat esconter
 ## get blocked count
 ## API FEATURE INTRODUCTION
 ## POST CONTROLLER
+## MONGOOSE HOOKS EXPLAINED
 ## LAST DATE USER CREATED A POST
+## check if user is active or not
 
 ```javascript
 ```
