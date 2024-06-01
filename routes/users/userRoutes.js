@@ -10,6 +10,8 @@ const {
     profilePhototoUploadCtrl,
     whoViewMyProfileCtrl,
     followingCtrl,
+    unFollowCtrl,
+    blockUsersCtrl,
 } = require('../../controllers/users/userCtrl');
 const storage = require('../../config/cloudinary');
 
@@ -50,5 +52,11 @@ userRouter.get('/who-view-my-profile/:id',isLogin , whoViewMyProfileCtrl);
 
 //GET/api/v1/users/following/id
 userRouter.get('/following/:id',isLogin , followingCtrl);
+
+//GET/api/v1/users/unfollow/id
+userRouter.get('/unfollow/:id',isLogin , unFollowCtrl);
+
+//GET/api/v1/users/block/id
+userRouter.get('/block/:id',isLogin , blockUsersCtrl);
 
 module.exports = userRouter

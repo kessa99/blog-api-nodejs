@@ -282,6 +282,88 @@ const followingCtrl = async(req, res, next) => {
 };
 
 // ---------------------- Users-Unfollows ----------------------------------
+// Unfollow Controller
+const unFollowCtrl = async(req, res, next) => {
+    try{
+        // 1.find the user to be unfollowed
+        const userToBeUnfollow = await User.findById(req.params.id);
+        // 2.find the user who is unfollowing
+        const userWhoUnfollow = await User.findById(req.userAuth);
+        // 3.check if userToBeUnfollow and userWhoUnfollow are found
+        if(userToBeUnfollow && userWhoUnfollow){
+            // 4.check if userWhoUnfollow is already in the following array
+            const isUserAlreadyFollowing = userToBeUnfollow.followers.find(
+                follower => follower.toString() === userWhoUnfollow._id.toString()
+            );
+            // 5.if user is not following
+            if(!isUserAlreadyFollowing){
+                return next(appErr('You are not followed this user', 404));
+            } else {
+                // 5.remove the userWhoUnfollow from the userToBeUnfollow followers array
+                userToBeUnfollow.followers = userToBeUnfollow.followers.filter(
+                    follower => follower.toString() !== userWhoUnfollow._id.toString()
+                );
+                // 6.save
+                await userToBeUnfollow.save();
+                // 7.remove the userToBeUnfollow from the userWhoUnfollow following array
+                userWhoUnfollow.following = userWhoUnfollow.following.filter(
+                    following => following.toString() !== userToBeUnfollow._id.toString()
+                );
+                // 8.save the userToBeUnfollow
+                await userWhoUnfollow.save();
+                res.json({
+                    status: 'success',
+                    message: 'You have successfully unfollowed this user'
+                })
+            }
+        }
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+};
+
+// ---------------------- Users-Blocked ----------------------------------
+// Block Controller
+const blockUsersCtrl = async (req, res, next) => {
+    try {
+        // 1. Find the user to be blocked
+        const userToBeBlocked = await User.findById(req.params.id);
+
+        // 2. Find the user who is blocking
+        const userWhoBlock = await User.findById(req.userAuth);
+
+        // 3. Check if userToBeBlocked and userWhoBlock are found
+        if (userToBeBlocked && userWhoBlock) {
+            // 4. Check if userWhoBlock is already in the blocked array
+            const isUserAlreadyBlocked = userWhoBlock.blocked.find(
+                block => block.toString() === userToBeBlocked._id.toString()
+            );
+
+            // 5. If user is already blocked
+            if (isUserAlreadyBlocked) {
+                return next(new AppErr('You have already blocked this user', 404));
+            } else {
+                // 6. Push the userToBeBlocked to the userWhoBlock blocked array
+                userWhoBlock.blocked.push(userToBeBlocked._id);
+
+                // 7. Save
+                await userWhoBlock.save();
+                return res.json({
+                    status: 'success',
+                    message: 'You have successfully blocked this user'
+                });
+            }
+        } else {
+            return next(new AppErr('User not found', 404));
+        }
+    } catch (err) {
+        return next(new AppErr(err.message, 500));
+    }
+};
+
 
 // export
 module.exports = {
@@ -295,4 +377,6 @@ module.exports = {
     profilePhototoUploadCtrl,
     whoViewMyProfileCtrl,
     followingCtrl,
+    unFollowCtrl,
+    blockUsersCtrl,
 }
