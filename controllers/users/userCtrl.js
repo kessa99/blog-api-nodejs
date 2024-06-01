@@ -48,27 +48,21 @@ const userRegisterCtrl = async (req, res, next) => {
 
 
 // login
-const userLoginCtrl = async(req, res) => {
+const userLoginCtrl = async(req, res, next) => {
     const { email, password } = req.body;
     try{
         // check id email exist
         const userFound = await User.findOne({ email });
 
         if(!userFound){
-            return res.json({
-                status: 'fail',
-                message: 'Invalid email or password'
-            });
+            return next(appErr('Invalid login credentials', 404));
         }
 
         // validate password
         const isPasswordMatch = await bcrypt.compare(password, userFound.password);
 
         if(!isPasswordMatch){
-            return res.json({
-                status: 'fail',
-                message: 'Invalid email or password'
-            });
+            return next(appErr('Password do not match', 404));
         }
 
         res.json({
@@ -82,9 +76,7 @@ const userLoginCtrl = async(req, res) => {
             },
         })
     } catch(err){
-        res.json({
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 };
 
@@ -97,10 +89,7 @@ const userGetOneCtrl = async(req, res) => {
             data: user
         })
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 }
 
@@ -114,10 +103,7 @@ const userGetAllCtrl = async(req, res) => {
             data: users
         })
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 };
 
@@ -153,14 +139,9 @@ const updateUserCtrl = async (req, res, next) => {
             data: user
         });
     } catch (err) {
-        res.json({
-            status: 'fail',
-            message: err.message
-        });
+        next(appErr(err.message));;
     }
 };
-
-module.exports = updateUserCtrl;
 
 
 // ---------------------- Updating password ----------------------------------
@@ -192,10 +173,7 @@ const updatePassewordUserCtrl = async(req, res, next) => {
             return next(appErr('Password is required', 404));
         }
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 };
 
@@ -256,10 +234,7 @@ const deleteUserAccountCtrl = async(req, res, next) => {
             message: 'Profile delete successfully'
         })
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 };
 
@@ -272,10 +247,7 @@ const userLogoutCtrl = async(req, res) => {
             message: 'User logout successfully'
         })
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 }
 
@@ -310,10 +282,7 @@ const whoViewMyProfileCtrl = async(req, res, next) => {
             }
         }
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 };
 
@@ -351,10 +320,7 @@ const followingCtrl = async(req, res, next) => {
         }
 
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 };
 
@@ -395,10 +361,7 @@ const unFollowCtrl = async(req, res, next) => {
             }
         }
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 };
 
@@ -474,10 +437,7 @@ const unBlockUserCtrl = async(req, res, next) => {
             }
         }
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 };
 
@@ -501,14 +461,11 @@ const adminBlockUserCtrl = async(req, res, next) => {
             message: 'You are successuffly blocked this user'
         })
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 }
 
-// ---------------------- admin-Blocked user----------------------------------
+// ---------------------- admin-UnBlocked user----------------------------------
 // admin-unblock
 const adminUnBlockUserCtrl = async(req, res, next) => {
     try{
@@ -528,10 +485,7 @@ const adminUnBlockUserCtrl = async(req, res, next) => {
             message: 'You are successuffly unblocked this user'
         })
     } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 }
 
@@ -545,6 +499,7 @@ module.exports = {
     userGetOneCtrl,
     userGetAllCtrl,
     deleteUserAccountCtrl,
+    updateUserCtrl,
     deleteUserCtrl,
     userLogoutCtrl,
     profilePhototoUploadCtrl,

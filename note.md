@@ -3252,6 +3252,7 @@ j'obtiens alors le resultat esconter
 ## controler update password
 ## DELETE USER ACCOUNT
 ## USER API RETURN ERROR
+## Creation categori
 
 ```javascript
 ```

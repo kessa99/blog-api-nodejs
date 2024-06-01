@@ -23,10 +23,7 @@ const createpostCtrl = async(req, res) => {
             data: postCreated,
         })
     } catch(err){
-        res.json({
-            status: 'Error in creating post',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 };
 
@@ -37,10 +34,7 @@ const postGetOneCtrl = async(req, res) => {
             message: 'post fetched successfully'
         })
     } catch(err){
-        res.json({
-            status: 'Error in fetching post',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 }
 
@@ -51,10 +45,7 @@ const postGetAllCtrl = async(req, res) => {
             message: 'All posts fetched successfully'
         })
     } catch(err){
-        res.json({
-            status: 'Error in fetching all posts',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 }
 
@@ -65,10 +56,7 @@ const postUpdateCtrl = async(req, res) => {
             message: 'post updated successfully'
         })
     } catch(err){
-        res.json({
-            status: 'Error in updating post',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 }
 
@@ -79,10 +67,7 @@ const postDeleteCtrl = async(req, res) => {
             message: 'post deleted successfully'
         })
     } catch(err){
-        res.json({
-            status: 'Error in deleting post',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 }
 
