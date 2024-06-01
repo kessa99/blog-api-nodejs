@@ -23,10 +23,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         required:[true, 'Password is required']
     },
-    postCount: {
-        type: Number,
-        default: 0
-    },
     isBlocked: {
         type: Boolean,
         default: false
@@ -37,9 +33,9 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['Admin', 'Guest', 'Editor',]
+        enum: ['Admin', 'Guest', 'Editor']
     },
-    viewBy: [
+    viewers: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -57,10 +53,6 @@ const userSchema = new mongoose.Schema({
             ref: "User",
         },
     ],
-    active: {
-        type: Boolean,
-        default: true
-    },
     posts: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -80,7 +72,7 @@ const userSchema = new mongoose.Schema({
     },
     userAward:{
         type: String,
-        enum: ['Gold', 'Silver', 'Bronze'],
+        enum: ['Bronze', 'Silver', 'Gold'],
         default: 'Bronze'
     }
 },

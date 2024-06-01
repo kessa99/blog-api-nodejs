@@ -8,7 +8,9 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 //import routes
+// ./routes/users/userRoutes.js
 const userRouter = require('./routes/users/userRoutes');
+// const userRouter = require('./routes/users/userRoutes');
 const postRouter = require('./routes/posts/postRouter');
 const commentRouter = require('./routes/comment/commentRouter');
 const categoryRouter = require('./routes/category/categoryRouter');
@@ -40,7 +42,7 @@ app.use((req, res, next) => {
 
 
 // ROUTES
-app.use('/api/v1/users', userRouter);
+app.use('/api/v1/users/', userRouter);
 app.use('/api/v1/posts/', postRouter);
 app.use('/api/v1/comments/', commentRouter);
 app.use('/api/v1/category/', categoryRouter);

@@ -140,6 +140,14 @@ la base de donneé est connecté avec succés
 ```javascript
 mongodb+srv://<database_name>:<password>@mydbcluster.lopjuxe.mongodb.net/
 ```
+
+
+```javascript
+The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+```
+
+Dans ce cas telehrager de dotenv package
+
 dans ce pop-up puis entré et normalement vous devriez etre connecter
 
 ## Creations des models
@@ -3196,14 +3204,32 @@ apres test nous aurons ainsi:
 {
   "status": "success",
   "data": "Profile photo uploaded successfully"
-}T
+}
 ```
 
 ```javascript
+//POST/api/v1/users/profile-photo-upload
+userRouter.post('/profile-photo-upload', upload.single('profile-based'), profilePhototoUploadCtrl);
 ```
 
+j'obtiens alors le resultat esconter
+
 ```javascript
+{
+  fieldname: 'profile-based',
+  originalname: 'test-cloudinary.jpg',
+  encoding: '7bit',
+  mimetype: 'image/jpeg',
+  path: 'https://res.cloudinary.com/dmmh0fzto/image/upload/v1717221283/blog-api/bltwffc36cmkb4mbr09m.jpg',
+  size: 18980,
+  filename: 'blog-api/bltwffc36cmkb4mbr09m'
+}
 ```
+
+## PROFILE PHOTO
+## Who views my profile
+## Follow or unfollores another user
+## Unfollowing
 ```javascript
 ```
 

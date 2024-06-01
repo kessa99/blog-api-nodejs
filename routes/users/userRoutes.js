@@ -8,6 +8,8 @@ const {
     deleteUserCtrl,
     userLogoutCtrl,
     profilePhototoUploadCtrl,
+    whoViewMyProfileCtrl,
+    followingCtrl,
 } = require('../../controllers/users/userCtrl');
 const storage = require('../../config/cloudinary');
 
@@ -35,12 +37,18 @@ userRouter.get('/', userGetAllCtrl);
 userRouter.put('/:id', updateUserCtrl);
 
 //POST/api/v1/users/profile-photo-upload
-userRouter.post('/profile-photo-upload', upload.single('profile'), profilePhototoUploadCtrl);
+userRouter.post('/profile-photo-upload', upload.single('profile-based'), isLogin, profilePhototoUploadCtrl);
 
 //DELETE/api/v1/users/:id
 userRouter.delete('/:id', deleteUserCtrl);
 
 //GET/api/v1/users/logout
 userRouter.get('/logout', userLogoutCtrl);
+
+//GET/api/v1/users/who-view-my-profile/id
+userRouter.get('/who-view-my-profile/:id',isLogin , whoViewMyProfileCtrl);
+
+//GET/api/v1/users/following/id
+userRouter.get('/following/:id',isLogin , followingCtrl);
 
 module.exports = userRouter

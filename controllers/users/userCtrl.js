@@ -5,6 +5,7 @@ const getTokenFromHeader = require('../../utils/getTokenFromHeaders');
 const { appErr, AppErr } = require('../../utils/appErr');
 const storage = require('../../config/cloudinary');
 
+// ---------------------- Users ----------------------------------
 
 // register
 const userRegisterCtrl = async (req, res, next) => {
@@ -33,8 +34,6 @@ const userRegisterCtrl = async (req, res, next) => {
             email,
             password: hashedPassword
         });
-
-        console.log('User created successfully');
         return res.json({
             status: 'succès',
             data: user
@@ -86,7 +85,6 @@ const userLoginCtrl = async(req, res) => {
     }
 };
 
-
 // get one user(Profile)
 const userGetOneCtrl = async(req, res) => {
     try{
@@ -135,18 +133,40 @@ const updateUserCtrl = async(req, res) => {
 };
 
 // Profile photo Upload
-const profilePhototoUploadCtrl = async(req, res) => {
-    console.log(req.file);
-    try{
-        res.json({
-            status: 'success',
-            data: 'Profile photo uploaded successfully'
-        })
-    } catch(err){
-        res.json({
-            status: 'fail',
-            message: err.message
-        })
+const profilePhototoUploadCtrl = async(req, res, next) => {
+    // console.log(req.file);
+    // 1.find the user to be updated
+    const userToUpdate = await User.findById(req.userAuth);
+    // 2.check if user is found
+    if(!userToUpdate){
+        return next(appErr('User not found', 404));
+    }
+    // 3. check if user is blocked
+    if(userToUpdate.isBlocked){
+        return next(appErr('Action not allowed your account is blocked', 403));
+    }
+    // 4.check if a user is updating their photo
+    if(req.file){
+        try{
+            // 5. update the user profile photo
+            await User.findByIdAndUpdate(
+                req.userAuth, 
+                {
+                    $set:{
+                        profilePhoto: req.file.path
+                    },
+                },
+                {
+                    new: true,
+                }
+            );
+            res.json({
+                status: 'success',
+                data: 'Profile photo uploaded successfully humm'
+            })
+        } catch(err){
+            next(appErr(err.message, 500));
+        }
     }
 };
 
@@ -183,6 +203,86 @@ const userLogoutCtrl = async(req, res) => {
 }
 
 
+// ---------------------- Users-Viewers ----------------------------------
+
+// who view my profile
+const whoViewMyProfileCtrl = async(req, res, next) => {
+    try{
+        // 1.find the original user
+        const user = await User.findById(req.params.id);
+        // 2.find the user who view the original user
+        const userWhoView = await User.findById(req.userAuth);
+
+        // 3.check if original user who view are found
+        if (user && userWhoView) {
+            //4. check if userWhoView is already in the viewers array
+            const isUserAlreadyViewed = user.viewers.find(
+                viewer => viewer.toString() === userWhoView._id.toString()
+            );
+            if (isUserAlreadyViewed) {
+                next(appErr('User already viewed', 404));
+            } else {
+                // 5.push the userWhovied the users's viewers array
+                user.viewers.push(userWhoView._id);
+                // 6. save the user
+                await user.save();
+                res.json({
+                    status: 'success',
+                    data: 'You have successfully viewed this profile'
+                });
+            }
+        }
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+};
+
+// ---------------------- Users-follows and followers ----------------------------------
+// followings users
+const followingCtrl = async(req, res, next) => {
+    try{
+        // 1.findthe user to be followed
+        const userToFollow = await User.findById(req.params.id);
+
+        // 2.find the user who is follow
+        const userWhoFollow = await User.findById(req.userAuth);
+
+        // 3.check if userToFollow and userWhoFollow are found
+        if(userToFollow && userWhoFollow){
+            // 4.check if userWhoFollow is already in the following array
+            const isUserAlreadyFollowing = userToFollow.following.find(
+                follower => follower.toString() === userWhoFollow._id.toString()
+            );
+            if(isUserAlreadyFollowing){
+                next(appErr('User already following', 404))
+            } else {
+                // 5.push the userWhoFollow to the userToFollow followers array
+                userToFollow.followers.push(userWhoFollow._id);
+                // 6.push the userToFollow to the userWhoFollow following array
+                userWhoFollow.following.push(userToFollow._id);
+                // 6.save the userToFollow
+                await userWhoFollow.save();
+                await userToFollow.save();
+                res.json({
+                    status: 'success',
+                    message: 'you have successfully followed this user'
+                })
+            }
+        }
+
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+};
+
+// ---------------------- Users-Unfollows ----------------------------------
+
 // export
 module.exports = {
     userRegisterCtrl,
@@ -193,4 +293,6 @@ module.exports = {
     deleteUserCtrl,
     userLogoutCtrl,
     profilePhototoUploadCtrl,
+    whoViewMyProfileCtrl,
+    followingCtrl,
 }
