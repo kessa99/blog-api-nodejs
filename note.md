@@ -3249,6 +3249,7 @@ j'obtiens alors le resultat esconter
 ## UPGRADE USER ACCOUNT(update userAward based onthe number of posts)
 ## FETCH ALL POSTS
 ## Controlers for update profile
+## controler update password
 
 ```javascript
 ```

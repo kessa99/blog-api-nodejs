@@ -162,12 +162,32 @@ module.exports = updateUserCtrl;
 
 // ---------------------- Updating password ----------------------------------
 // update user
-const updatePassewordUserCtrl = async(req, res) => {
+const updatePassewordUserCtrl = async(req, res, next) => {
+    const { password } = req.body;
     try{
-        res.json({
-            status: 'success',
-            message: 'Profile update successfully'
-        })
+        // check if user is updating the password
+        if(password) {
+            // hash the password
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            // update the user password
+            const user = await User.findByIdAndUpdate(
+                req.userAuth,
+                {
+                    password: hashedPassword
+                },
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
+            res.json({
+                status: 'success',
+                message: 'Password change successfully'
+            })
+        } else {
+            return next(appErr('Password is required', 404));
+        }
     } catch(err){
         res.json({
             status: 'fail',
@@ -522,4 +542,5 @@ module.exports = {
     unBlockUserCtrl,
     adminBlockUserCtrl,
     adminUnBlockUserCtrl,
+    updatePassewordUserCtrl,
 }

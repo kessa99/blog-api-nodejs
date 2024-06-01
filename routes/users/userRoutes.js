@@ -15,6 +15,7 @@ const {
     unBlockUserCtrl,
     adminBlockUserCtrl,
     adminUnBlockUserCtrl,
+    updatePassewordUserCtrl,
 } = require('../../controllers/users/userCtrl');
 const storage = require('../../config/cloudinary');
 
@@ -41,6 +42,9 @@ userRouter.get('/', userGetAllCtrl);
 
 //PUT/api/v1/users/
 userRouter.put('/',isLogin , updateUserCtrl);
+
+//PUT PASSWORD/api/v1/users/
+userRouter.put('/update-password',isLogin , updatePassewordUserCtrl);
 
 //POST/api/v1/users/profile-photo-upload
 userRouter.post('/profile-photo-upload', upload.single('profile-based'), isLogin, profilePhototoUploadCtrl);
