@@ -3248,6 +3248,7 @@ j'obtiens alors le resultat esconter
 ## LAST ACTIVE DATE
 ## UPGRADE USER ACCOUNT(update userAward based onthe number of posts)
 ## FETCH ALL POSTS
+## Controlers for update profile
 
 ```javascript
 ```
