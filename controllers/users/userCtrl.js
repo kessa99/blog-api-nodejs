@@ -105,9 +105,10 @@ const userGetOneCtrl = async(req, res) => {
 // get all user
 const userGetAllCtrl = async(req, res) => {
     try{
+        const users = await User.find();
         res.json({
             status: 'success',
-            message: 'all User fetched successfully'
+            data: users
         })
     } catch(err){
         res.json({
@@ -432,14 +433,14 @@ const adminBlockUserCtrl = async(req, res, next) => {
 }
 
 // ---------------------- admin-Blocked user----------------------------------
-// admin-block
+// admin-unblock
 const adminUnBlockUserCtrl = async(req, res, next) => {
     try{
         // 1. find the user to be unblocked
         const userToUnBeBlocked = await User.findById(req.params.id);
 
         // 2. check if user is found
-        if(!userToBeBlocked){
+        if(!userToUnBeBlocked){
             return next(appErr('User not found', 404));
         }
         // check is isBlocked to false
@@ -457,6 +458,7 @@ const adminUnBlockUserCtrl = async(req, res, next) => {
         })
     }
 }
+
 
 // export
 module.exports = {

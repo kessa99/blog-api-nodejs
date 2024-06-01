@@ -67,9 +67,9 @@ userRouter.get('/block/:id',isLogin , blockUsersCtrl);
 userRouter.get('/unblocked/:id',isLogin , unBlockUserCtrl);
 
 //GET/api/v1/users/admin-block/id
-userRouter.get('/admin-block/:id',isAdmin , adminBlockUserCtrl);
+userRouter.get('/admin-block/:id',isLogin ,isAdmin , adminBlockUserCtrl);
 
 //PUT/api/v1/users/admin-unblock/id
-userRouter.put('/admin-unblock/:id',isAdmin , adminUnBlockUserCtrl);
+userRouter.put('/admin-unblock/:id',isLogin, isAdmin , adminUnBlockUserCtrl);
 
 module.exports = userRouter

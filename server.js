@@ -1,6 +1,7 @@
 // import express
 const express = require('express');
 
+
 //import mongoose
 const mongoose = require('mongoose');
 
@@ -24,9 +25,11 @@ require('./config/dbConnect');
 const app = express();
 
 // middleware
-app.use(isAdmin);
+
 
 app.use(express.json());
+app.use(isAdmin);
+
 const userAuth = {
     isLogin: true,
     isAdmin: false,

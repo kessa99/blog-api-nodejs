@@ -77,10 +77,26 @@ const userSchema = new mongoose.Schema({
     }
 },
 {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
 }
 
 );
+
+// GET FULLNAME
+userSchema.virtual('fullname').get(function(){
+    return `${this.firstname} ${this.lastname}`;
+});
+
+// GET USER INITIALS
+userSchema.virtual('initials').get(function(){
+    return this.posts.length;
+});
+
+// get post count
+userSchema.virtual('postCounts').get(function(){
+    return `${this.firstname[0]}${this.lastname[0]}`;
+});
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;
