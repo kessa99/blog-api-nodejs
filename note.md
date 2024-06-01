@@ -3250,6 +3250,8 @@ j'obtiens alors le resultat esconter
 ## FETCH ALL POSTS
 ## Controlers for update profile
 ## controler update password
+## DELETE USER ACCOUNT
+## USER API RETURN ERROR
 
 ```javascript
 ```

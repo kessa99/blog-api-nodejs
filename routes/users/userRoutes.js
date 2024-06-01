@@ -5,7 +5,7 @@ const {
     userGetOneCtrl,
     userGetAllCtrl,
     updateUserCtrl,
-    deleteUserCtrl,
+    deleteUserAccountCtrl,
     userLogoutCtrl,
     profilePhototoUploadCtrl,
     whoViewMyProfileCtrl,
@@ -41,7 +41,7 @@ userRouter.get('/profile/', isLogin, userGetOneCtrl);
 userRouter.get('/', userGetAllCtrl);
 
 //PUT/api/v1/users/
-userRouter.put('/',isLogin , updateUserCtrl);
+userRouter.put('/delete-account',isLogin , updateUserCtrl);
 
 //PUT PASSWORD/api/v1/users/
 userRouter.put('/update-password',isLogin , updatePassewordUserCtrl);
@@ -50,7 +50,7 @@ userRouter.put('/update-password',isLogin , updatePassewordUserCtrl);
 userRouter.post('/profile-photo-upload', upload.single('profile-based'), isLogin, profilePhototoUploadCtrl);
 
 //DELETE/api/v1/users/:id
-userRouter.delete('/:id', deleteUserCtrl);
+userRouter.delete('/:id', deleteUserAccountCtrl);
 
 //GET/api/v1/users/logout
 userRouter.get('/logout', userLogoutCtrl);

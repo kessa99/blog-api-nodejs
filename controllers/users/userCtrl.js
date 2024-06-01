@@ -4,7 +4,10 @@ const generateToken = require('../../utils/generateToken');
 const getTokenFromHeader = require('../../utils/getTokenFromHeaders');
 const { appErr, AppErr } = require('../../utils/appErr');
 const storage = require('../../config/cloudinary');
-
+const multer = require('multer');
+const Post = require('../../model/Post/Post');
+const Category = require('../../model/Category/Category');
+const Comment = require('../../model/Comment/Comment');
 // ---------------------- Users ----------------------------------
 
 // register
@@ -236,8 +239,18 @@ const profilePhototoUploadCtrl = async(req, res, next) => {
 
 
 // delete user
-const deleteUserCtrl = async(req, res) => {
+const deleteUserAccountCtrl = async(req, res, next) => {
     try{
+        //1.find the user to be deleted
+        const userToBeDelete = await User.findById(req.userAuth);
+        // 2.find all posts to be deleted
+        await Post.deleteMany({ user: req.userAuth });
+        // 3.delete all comments of the user
+        await Comment.deleteMany({ user: req.userAuth });
+        // 4. delete all category of the user
+        await Category.deleteMany({ user: req.userAuth });
+        // 5.delete
+        await userToBeDelete.delete();
         res.json({
             status: 'success',
             message: 'Profile delete successfully'
@@ -531,7 +544,7 @@ module.exports = {
     userLoginCtrl,
     userGetOneCtrl,
     userGetAllCtrl,
-    updateUserCtrl,
+    deleteUserAccountCtrl,
     deleteUserCtrl,
     userLogoutCtrl,
     profilePhototoUploadCtrl,
