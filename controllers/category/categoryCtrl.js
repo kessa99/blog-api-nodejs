@@ -1,56 +1,53 @@
-const categoryPost = async (req, res) => {
+const Category = require('../../model/Category/Category')
+const { appErr } = require('../../utils/appErr');
+
+const CreateCategoryPost = async (req, res, next) => {
+    const {} = req.body;
     try {
+        const category = await Category.create({title, user: req.userAuth})
         res.json({
             status: 'success',
-            message: 'category created successfully'
+            data: category
         })
     } catch (err) {
-        res.json({
-            status: 'Error in creating category',
-            message: err.message
-        })
+        return next(appErr(err.message))
     }
 };
 
-const categoryGetOne = async (req, res) => {
+const categoryGetOneCtrl = async (req, res) => {
     try {
+        const categories = await Category.findById(req.params.id)
         res.json({
             status: 'success',
-            message: 'category fetched successfully'
+            data: categories
         })
     } catch (err) {
-        res.json({
-            status: 'Error in fetching category',
-            message: err.message
-        })
+        return next(appErr(err.message))
     }
 };
 
-const categoryGetAll = async (req, res) => {
+const fetchCategoryCtrl = async (req, res) => {
     try {
+        const categories = await Category.find()
         res.json({
             status: 'success',
-            message: 'All category fetched successfully'
+            data: categories,
         })
     } catch (err) {
-        res.json({
-            status: 'Error in fetching all category',
-            message: err.message
-        })
+        return next(appErr(err.message))
     }
 };
 
-const categoryUpdate = async (req, res) => {
+const categoryUpdateCtrl = async (req, res) => {
+    const {title} = req.body;
     try {
+        const categories = await Category.findByIdAndUpdate(req.params.id, {title}, {new: true})
         res.json({
             status: 'success',
-            message: 'category updtae successfully'
+            data: categories
         })
     } catch (err) {
-        res.json({
-            status: 'Error in updating post',
-            message: err.message
-        })
+        return next(appErr(err.message))
     }
 };
 
@@ -61,17 +58,14 @@ const categoryDelete = async (req, res) => {
             message: 'category deleted successfully'
         })
     } catch (err) {
-        res.json({
-            status: 'Error in deleting category',
-            message: err.message
-        })
+        return next(appErr(err.message))
     }
 };
 
 module.exports = {
-    categoryPost,
-    categoryGetOne,
-    categoryGetAll,
-    categoryUpdate,
+    CreateCategoryPost,
+    categoryGetOneCtrl,
+    fetchCategoryCtrl,
+    categoryUpdateCtrl,
     categoryDelete
 }
