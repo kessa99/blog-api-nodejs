@@ -12,6 +12,8 @@ const {
     followingCtrl,
     unFollowCtrl,
     blockUsersCtrl,
+    unBlockUserCtrl,
+    adminBlockUserCtrl,
 } = require('../../controllers/users/userCtrl');
 const storage = require('../../config/cloudinary');
 
@@ -58,5 +60,11 @@ userRouter.get('/unfollow/:id',isLogin , unFollowCtrl);
 
 //GET/api/v1/users/block/id
 userRouter.get('/block/:id',isLogin , blockUsersCtrl);
+
+//GET/api/v1/users/unblockek/id
+userRouter.get('/unblocked/:id',isLogin , unBlockUserCtrl);
+
+//GET/api/v1/users/admin-block/id
+userRouter.get('/admin-block/:id',isLogin , unBlockUserCtrl);
 
 module.exports = userRouter

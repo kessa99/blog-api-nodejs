@@ -364,7 +364,61 @@ const blockUsersCtrl = async (req, res, next) => {
     }
 };
 
+// ---------------------- Users-unBlocked ----------------------------------
+// unBlocked
+const unBlockUserCtrl = async(req, res, next) => {
+    try{
+        // 1.find the user to be unblocked
+        const userToBeUnblocked = await User.findById(req.params.id);
 
+        // 2.find the user who is unblocking
+        const userWhoUnblock = await User.findById(req.userAuth);
+
+        // 3.check if userToBeUnblocked and userWhoUnblock are found
+        if (userToBeUnblocked && userWhoUnblock) {
+            // 4.check if userToBeUnblocked is already in the blocked array
+            const isUserAlreadyBlocked = userWhoUnblock.blocked.find(
+                block => block.toString() === userToBeUnblocked._id.toString()
+            );
+            // 5.if user is not blocked
+            if (!isUserAlreadyBlocked) {
+                return next(new AppErr('You have not blocked this user', 404));
+            } else {
+                // 6.remove the userToBeUnblocked from the main user
+                userWhoUnblock.blocked = userWhoUnblock.blocked.filter(
+                    block => block.toString() !== userToBeUnblocked._id.toString()
+                );
+                // 7.save
+                await userWhoUnblock.save();
+                res.json({
+                    status: 'success',
+                    message: 'You have successfully unblocked this user'
+                });
+            }
+        }
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+};
+
+// ---------------------- admin-Blocked user----------------------------------
+// logout
+const adminBlockUserCtrl = async(req, res, next) => {
+    try{
+        res.json({
+            status: 'success',
+            message: 'User blocked'
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+}
 // export
 module.exports = {
     userRegisterCtrl,
@@ -379,4 +433,6 @@ module.exports = {
     followingCtrl,
     unFollowCtrl,
     blockUsersCtrl,
+    unBlockUserCtrl,
+    adminBlockUserCtrl,
 }

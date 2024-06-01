@@ -3230,7 +3230,8 @@ j'obtiens alors le resultat esconter
 ## Who views my profile
 ## Follow or unfollores another user
 ## Unfollowing
-## admin block users
+## user block users
+## unblocked
 ```javascript
 ```
 
