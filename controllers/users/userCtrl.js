@@ -405,12 +405,23 @@ const unBlockUserCtrl = async(req, res, next) => {
 };
 
 // ---------------------- admin-Blocked user----------------------------------
-// logout
+// admin-block
 const adminBlockUserCtrl = async(req, res, next) => {
     try{
+        // 1. find the user to be blocked
+        const userToBeBlocked = await User.findById(req.params.id);
+
+        // 2. check if user is found
+        if(!userToBeBlocked){
+            return next(appErr('User not found', 404));
+        }
+        // check is isBlocked to true
+        userToBeBlocked.isBlocked = true;
+        // 4.save
+        await userToBeBlocked.save();
         res.json({
             status: 'success',
-            message: 'User blocked'
+            message: 'You are successuffly blocked this user'
         })
     } catch(err){
         res.json({
@@ -419,6 +430,34 @@ const adminBlockUserCtrl = async(req, res, next) => {
         })
     }
 }
+
+// ---------------------- admin-Blocked user----------------------------------
+// admin-block
+const adminUnBlockUserCtrl = async(req, res, next) => {
+    try{
+        // 1. find the user to be unblocked
+        const userToUnBeBlocked = await User.findById(req.params.id);
+
+        // 2. check if user is found
+        if(!userToBeBlocked){
+            return next(appErr('User not found', 404));
+        }
+        // check is isBlocked to false
+        userToUnBeBlocked.isBlocked = false;
+        // 4.save
+        await userToUnBeBlocked.save();
+        res.json({
+            status: 'success',
+            message: 'You are successuffly unblocked this user'
+        })
+    } catch(err){
+        res.json({
+            status: 'fail',
+            message: err.message
+        })
+    }
+}
+
 // export
 module.exports = {
     userRegisterCtrl,
@@ -435,4 +474,5 @@ module.exports = {
     blockUsersCtrl,
     unBlockUserCtrl,
     adminBlockUserCtrl,
+    adminUnBlockUserCtrl,
 }

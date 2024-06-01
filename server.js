@@ -14,6 +14,8 @@ const userRouter = require('./routes/users/userRoutes');
 const postRouter = require('./routes/posts/postRouter');
 const commentRouter = require('./routes/comment/commentRouter');
 const categoryRouter = require('./routes/category/categoryRouter');
+const isAdmin = require('./middlewares/isAdmin');
+const isLogin = require('./middlewares/isLogin');
 
 const globalErrorHandler = require('./middlewares/globalErrorHandler');
 
@@ -22,6 +24,7 @@ require('./config/dbConnect');
 const app = express();
 
 // middleware
+app.use(isAdmin);
 
 app.use(express.json());
 const userAuth = {

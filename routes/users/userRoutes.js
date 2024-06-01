@@ -14,12 +14,14 @@ const {
     blockUsersCtrl,
     unBlockUserCtrl,
     adminBlockUserCtrl,
+    adminUnBlockUserCtrl,
 } = require('../../controllers/users/userCtrl');
 const storage = require('../../config/cloudinary');
 
 const multer = require('multer');
 
 const isLogin = require('../../middlewares/isLogin');
+const isAdmin = require('../../middlewares/isAdmin');
 const userRouter = express.Router();
 
 // instance of multer
@@ -65,6 +67,9 @@ userRouter.get('/block/:id',isLogin , blockUsersCtrl);
 userRouter.get('/unblocked/:id',isLogin , unBlockUserCtrl);
 
 //GET/api/v1/users/admin-block/id
-userRouter.get('/admin-block/:id',isLogin , unBlockUserCtrl);
+userRouter.get('/admin-block/:id',isAdmin , adminBlockUserCtrl);
+
+//PUT/api/v1/users/admin-unblock/id
+userRouter.put('/admin-unblock/:id',isAdmin , adminUnBlockUserCtrl);
 
 module.exports = userRouter

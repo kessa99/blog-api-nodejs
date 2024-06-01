@@ -3232,6 +3232,8 @@ j'obtiens alors le resultat esconter
 ## Unfollowing
 ## user block users
 ## unblocked
+## MIDDLEWARE TO CHECK IF USER IS ADMIN OR NOT
+
 ```javascript
 ```
 
