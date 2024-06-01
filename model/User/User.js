@@ -65,11 +65,11 @@ const userSchema = new mongoose.Schema({
             ref: "User",
         },
     ],
-    // plan: {
-    //     type: String,
-    //     enum: ['Free', 'Premium', 'Pro'],
-    //     default: 'Free'
-    // },
+    plan: {
+        type: String,
+        enum: ['Free', 'Premium', 'Pro'],
+        default: 'Free'
+    },
     userAward:{
         type: String,
         enum: ['Bronze', 'Silver', 'Gold'],
@@ -99,7 +99,25 @@ userSchema.pre('findOne', function(next){
     userSchema.virtual('lastPost').get(function(){
         return lastPostDateString;
     });
-    console.log(lastPostDateString);
+    // --------------------------Check if user is inactive for 30 days----------------------------------
+    // get current date
+    const currentDate = new Date();
+    // get the difference between the lask post date and current date
+    const diff = currentDate - lastPostDate;
+    // get difference in days and returns less than in days
+    const diffInDays = diff / (1000 * 60 * 60 * 24);
+    // check if the user is inactive for 30 days
+    if(diffInDays > 30){
+        // set the user to inactive
+        userSchema.virtual('isInActive').get(function(){
+            return true;
+        });
+        // find the user by id and set the user to inactive
+    } else {
+        userSchema.virtual('isInActive').get(function(){
+            return false;
+        });
+    }
     next();
 });
 // POST -AFTER SAVING

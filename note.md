@@ -3245,6 +3245,9 @@ j'obtiens alors le resultat esconter
 ## MONGOOSE HOOKS EXPLAINED
 ## LAST DATE USER CREATED A POST
 ## check if user is active or not
+## LAST ACTIVE DATE
+## UPGRADE USER ACCOUNT(update userAward based onthe number of posts)
+## FETCH ALL POSTS
 
 ```javascript
 ```
