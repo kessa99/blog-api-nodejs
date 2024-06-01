@@ -84,47 +84,93 @@ const userSchema = new mongoose.Schema({
 );
 // HOOKS
 // PRE-BEFORE RECORD IS SAVED
-userSchema.pre('findOne', function(next){
-    // get the user id
-    const userId = this._conditions._id;
-    // find the post create by the user
-    const posts = await Post.find({user: userId});
-    // check if the post is found
-    const lastPost = posts[posts.length - 1];
-    // get the last post date
-    const lastPostDate = new Date(lastPost.createdAt);
-    // get the last post date u string format
-    const lastPostDateString = lastPostDate.toDateString();
-    // add virtuals to the schema
-    userSchema.virtual('lastPost').get(function(){
-        return lastPostDateString;
-    });
-    // --------------------------Check if user is inactive for 30 days----------------------------------
-    // get current date
-    const currentDate = new Date();
-    // get the difference between the lask post date and current date
-    const diff = currentDate - lastPostDate;
-    // get difference in days and returns less than in days
-    const diffInDays = diff / (1000 * 60 * 60 * 24);
-    // check if the user is inactive for 30 days
-    if(diffInDays > 30){
-        // set the user to inactive
-        userSchema.virtual('isInActive').get(function(){
-            return true;
+userSchema.pre('findOne', async function(next) {
+    try {
+        // populate the post
+        this.populate({
+            path: 'posts',
         });
-        // find the user by id and set the user to inactive
-    } else {
-        userSchema.virtual('isInActive').get(function(){
-            return false;
+
+        // get the user id
+        const userId = this._conditions._id;
+
+        // find the post create by the user
+        const posts = await Post.find({ user: userId });
+
+        // check if the post is found
+        const lastPost = posts[posts.length - 1];
+
+        // get the last post date
+        const lastPostDate = new Date(lastPost?.createdAt);
+
+        // get the last post date in string format
+        const lastPostDateString = lastPostDate.toDateString();
+
+        // add virtuals to the schema
+        userSchema.virtual('lastPost').get(function() {
+            return lastPostDateString;
         });
+
+        // Check if user is inactive for 30 days
+        const currentDate = new Date();
+        const diff = currentDate - lastPostDate;
+        const diffInDays = diff / (1000 * 60 * 60 * 24);
+
+        if (diffInDays > 30) {
+            // set the user to inactive
+            userSchema.virtual('isInActive').get(function() {
+                return true;
+            });
+            // find the user by id and set the user to inactive
+            await User.findByIdAndUpdate(userId, { isBlocked: true }, { new: true, runValidators: true });
+        } else {
+            userSchema.virtual('isInActive').get(function() {
+                return false;
+            });
+            // find the user by id and set the user to inactive
+            await User.findByIdAndUpdate(userId, { isBlocked: true }, { new: true, runValidators: true });
+        }
+
+        // Last active Date
+        const daysAgo = Math.floor(diffInDays);
+
+        // add virtual to the schema
+        userSchema.virtual('lastActive').get(function() {
+            // check if  daysAgo is less than 0
+            if (daysAgo < 0) {
+                return 'Today';
+            }
+            if (daysAgo === 1) {
+                return 'yesterday';
+            }
+            // check if ago is greater than 1
+            if (daysAgo > 1) {
+                return `${daysAgo} days ago`;
+            }
+            return daysAgo;
+        });
+
+        // update userAward based on the number of posts
+        const numberOfPost = posts.length;
+
+        if (numberOfPost < 10) {
+            // set the user award to bronze
+            await User.findByIdAndUpdate(userId, { userAward: 'Bronze' }, { new: true });
+        } else if (numberOfPost > 10 && numberOfPost <= 20) {
+            // set the user award to silver
+            await User.findByIdAndUpdate(userId, { userAward: 'Silver' }, { new: true });
+        } else if (numberOfPost > 20) {
+            // set the user award to gold
+            await User.findByIdAndUpdate(userId, { userAward: 'Gold' }, { new: true });
+        }
+
+        next();
+    } catch (error) {
+        next(error);
     }
-    next();
 });
-// POST -AFTER SAVING
-userSchema.post('save', function(doc, next){
-    console.log('look hook')
-    next();
-});
+
+
 
 // GET FULLNAME
 userSchema.virtual('fullname').get(function(){

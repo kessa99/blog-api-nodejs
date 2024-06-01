@@ -39,8 +39,8 @@ userRouter.get('/profile/', isLogin, userGetOneCtrl);
 //GET/api/v1/users
 userRouter.get('/', userGetAllCtrl);
 
-//PUT/api/v1/users/:id
-userRouter.put('/:id', updateUserCtrl);
+//PUT/api/v1/users/
+userRouter.put('/',isLogin , updateUserCtrl);
 
 //POST/api/v1/users/profile-photo-upload
 userRouter.post('/profile-photo-upload', upload.single('profile-based'), isLogin, profilePhototoUploadCtrl);

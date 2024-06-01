@@ -119,7 +119,50 @@ const userGetAllCtrl = async(req, res) => {
 };
 
 // update user
-const updateUserCtrl = async(req, res) => {
+const updateUserCtrl = async (req, res, next) => {
+    const { email, lastname, firstname } = req.body;
+    try {
+        // 1. Check if email is not taken
+        if (email) {
+            const emailTaken = await User.findOne({ email });
+            if (emailTaken) {
+                return next(appErr('Email already taken', 404));
+            }
+        }
+
+        // 2. Update the user
+        const user = await User.findByIdAndUpdate(
+            req.userAuth,
+            {
+                lastname,
+                firstname,
+                email
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        // 3. Send response
+        res.json({
+            status: 'success',
+            data: user
+        });
+    } catch (err) {
+        res.json({
+            status: 'fail',
+            message: err.message
+        });
+    }
+};
+
+module.exports = updateUserCtrl;
+
+
+// ---------------------- Updating password ----------------------------------
+// update user
+const updatePassewordUserCtrl = async(req, res) => {
     try{
         res.json({
             status: 'success',
@@ -458,6 +501,8 @@ const adminUnBlockUserCtrl = async(req, res, next) => {
         })
     }
 }
+
+
 
 
 // export
