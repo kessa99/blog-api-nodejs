@@ -1,9 +1,10 @@
 const express = require('express');
+const isLogin = require('../../middlewares/isLogin');
 
 const postRouter = express.Router();
 
 const {
-    postCtrl,
+    createpostCtrl,
     postGetOneCtrl,
     postGetAllCtrl,
     postUpdateCtrl,
@@ -11,7 +12,7 @@ const {
 } = require('../../controllers/posts/postCtrl');
 
 //POST/api/v1/posts
-postRouter.post('/', postCtrl);
+postRouter.post('/',isLogin ,createpostCtrl);
 
 //GET/api/v1/posts/:id
 postRouter.get('/:id', postGetOneCtrl);

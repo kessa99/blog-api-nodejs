@@ -3233,6 +3233,16 @@ j'obtiens alors le resultat esconter
 ## user block users
 ## unblocked
 ## MIDDLEWARE TO CHECK IF USER IS ADMIN OR NOT
+## GET FULLNAME
+## GET USER INITIALS
+## get post count
+## get followers count 
+## get following count
+## get viewers count
+## get blocked count
+## API FEATURE INTRODUCTION
+## POST CONTROLLER
+## LAST DATE USER CREATED A POST
 
 ```javascript
 ```
