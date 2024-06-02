@@ -74,6 +74,14 @@ postSchema.pre(/^find/, async function(next){
         const percentage = (this.dislikes.length / total) * 100;
         return `${percentage}%`;
     }));
+
+    // if day is less 0 return today if day is greater than 0 return yesterday or days ago
+    postSchema.virtual('DAYSaGO').get(function(){
+        const post = this
+        const date = new Date(post.createdAt);
+        const daysAgo = Math.floor((Date.now() - date) / 8640000);
+        return daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`;
+    });
     next();
 });
 const Post = mongoose.model('Post', postSchema);
