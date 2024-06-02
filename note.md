@@ -3260,6 +3260,7 @@ j'obtiens alors le resultat esconter
 ## unblocked user and he can see my post
 ## liske
 ## dislike
+## number of view post
 
 ```javascript
 ```

@@ -121,6 +121,32 @@ const toogleDisLikePostCtrl = async(req, res, next) => {
         next(appErr(err.message));
     }
 }
+// number of view post(details)
+const postDetailsCtrl = async(req, res) => {
+    try{
+        // find the post
+        const post = await Post.findById(req.params.id);
+        // number of views
+        // check if the user has already viewed the post
+        const isViewed = post.numViews.includes(req.userAuth);
+        if(isViewed) {
+            res.json({
+                status: 'success',
+                data: post
+            })
+        } else {
+            post.numViews.push(req.userAuth);
+        // save
+        await post.save();
+            res.json({
+                status: 'success',
+                data: post
+            })
+        }
+    } catch(err){
+        next(appErr(err.message));
+    }
+}
 
 const postUpdateCtrl = async(req, res) => {
     try{
@@ -152,4 +178,5 @@ module.exports = {
     postDeleteCtrl,
     toogleLikePostCtrl,
     toogleDisLikePostCtrl,
+    postDetailsCtrl,
 }

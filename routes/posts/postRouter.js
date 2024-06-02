@@ -11,6 +11,7 @@ const {
     postDeleteCtrl,
     toogleLikePostCtrl,
     toogleDisLikePostCtrl,
+    postDetailsCtrl,
 } = require('../../controllers/posts/postCtrl');
 
 //POST/api/v1/posts
@@ -27,6 +28,9 @@ postRouter.get('like/:id' ,toogleLikePostCtrl);
 
 //GET/api/v1/posts
 postRouter.get('dislike/:id' ,toogleDisLikePostCtrl);
+
+//GET/api/v1/posts
+postRouter.get('detail/:id',isLogin ,postDetailsCtrl);
 
 //PUT/api/v1/posts/:id
 postRouter.put('/:id', postUpdateCtrl);
