@@ -3261,6 +3261,7 @@ j'obtiens alors le resultat esconter
 ## liske
 ## dislike
 ## number of view post
+## like percentage
 
 ```javascript
 ```

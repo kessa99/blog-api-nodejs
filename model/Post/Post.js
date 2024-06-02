@@ -59,6 +59,21 @@ postSchema.pre(/^find/, async function(next){
     postSchema.virtual('dislikesCount').get(function(){
         return this.dislikes.length;
     });
+    // check the most liked post in percentage
+    parseInt(postSchema.virtual('likePercentage').get(function(){
+        // return this.likes.length / (this.likes.length + this.dislikes.length) * 100;
+        const total = +this.likes.length + +this.dislikes.length;
+        const percentage = (this.likes.length / total) * 100;
+        return `${percentage}%`;
+    }));
+
+    // check the most disliked post in percentage
+    parseInt(postSchema.virtual('dislikePercentage').get(function(){
+        // return this.likes.length / (this.likes.length + this.dislikes.length) * 100;
+        const total = +this.dislikes.length + +this.dislikes.length;
+        const percentage = (this.dislikes.length / total) * 100;
+        return `${percentage}%`;
+    }));
     next();
 });
 const Post = mongoose.model('Post', postSchema);
