@@ -6,7 +6,7 @@ const postRouter = express.Router();
 const {
     createpostCtrl,
     postGetOneCtrl,
-    postGetAllCtrl,
+    getAllPostCtrl,
     postUpdateCtrl,
     postDeleteCtrl
 } = require('../../controllers/posts/postCtrl');
@@ -18,7 +18,7 @@ postRouter.post('/',isLogin ,createpostCtrl);
 postRouter.get('/:id', postGetOneCtrl);
 
 //GET/api/v1/posts
-postRouter.get('/', postGetAllCtrl);
+postRouter.get('/',isLogin ,getAllPostCtrl);
 
 //PUT/api/v1/posts/:id
 postRouter.put('/:id', postUpdateCtrl);

@@ -3256,6 +3256,10 @@ j'obtiens alors le resultat esconter
 ## All category
 ## single category
 ## POST ENDPOINT 7 min 49
+## blocked user and he can not see my post
+## unblocked user and he can see my post
+## liske
+## dislike
 
 ```javascript
 ```

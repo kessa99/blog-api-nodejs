@@ -43,11 +43,25 @@ const postGetOneCtrl = async(req, res) => {
     }
 }
 
-const postGetAllCtrl = async(req, res) => {
+// get all posts
+const getAllPostCtrl = async(req, res, next) => {
     try{
+        // find all posts
+        const posts = await Post.find({}).populate('user').populate('category', 'title');
+
+        // chack is the logged in user is blocked by the post owner
+        const postsFiltered = posts.filter(post => {
+            // get all blocked users
+            const blockedUsers = post.user.blockedUsers;
+            const isBlocked = blockedUsers.includes(req.userAuth);
+            // if user is blocked return null(so no post show)
+            // return isBlocked ? null: post; or return !isBlocked;
+            // or
+            return !isBlocked;
+        });
         res.json({
             status: 'success',
-            message: 'All posts fetched successfully'
+            data: posts
         })
     } catch(err){
         next(appErr(err.message));
@@ -79,7 +93,7 @@ const postDeleteCtrl = async(req, res) => {
 module.exports = {
     createpostCtrl,
     postGetOneCtrl,
-    postGetAllCtrl,
+    getAllPostCtrl,
     postUpdateCtrl,
     postDeleteCtrl
 }
