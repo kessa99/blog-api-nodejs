@@ -51,6 +51,14 @@ postSchema.pre(/^find/, async function(next){
     postSchema.virtual('numViewsCount').get(function(){
         return this.numViews.length;
     });
+    //add likes count as virtual field
+    postSchema.virtual('likesCount').get(function(){
+        return this.likes.length;
+    });
+    //add likes count as virtual field
+    postSchema.virtual('dislikesCount').get(function(){
+        return this.dislikes.length;
+    });
     next();
 });
 const Post = mongoose.model('Post', postSchema);
