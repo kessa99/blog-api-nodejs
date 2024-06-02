@@ -6,7 +6,7 @@ const { appErr, AppErr } = require('../../utils/appErr');
 const storage = require('../../config/cloudinary');
 const multer = require('multer');
 const Post = require('../../model/Post/Post');
-const Category = require('../../model/Category/Category');
+const Category = require('../../model/category/Category');
 const Comment = require('../../model/Comment/Comment');
 // ---------------------- Users ----------------------------------
 
@@ -500,7 +500,6 @@ module.exports = {
     userGetAllCtrl,
     deleteUserAccountCtrl,
     updateUserCtrl,
-    deleteUserCtrl,
     userLogoutCtrl,
     profilePhototoUploadCtrl,
     whoViewMyProfileCtrl,

@@ -77,7 +77,7 @@ Exemple:
 reponse:
 ```javascript
 {
-	"status": "succès",
+	"status": "success",
 	"data": {
 		"firstname": "beni",
 		"lastname": "Yassi",
