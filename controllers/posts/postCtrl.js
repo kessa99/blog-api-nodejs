@@ -3,16 +3,21 @@ const User = require('../../models/User/User');
 
 
 // create a post
-const createpostCtrl = async(req, res) => {
-    const {tittle, description} = req.body;
+const createpostCtrl = async(req, res, next) => {
+    const {tittle, description, category} = req.body;
     try{
         // 1.find the user who creating the post
         const author = await User.findById(req.user._id);
+        // check if user is blocked
+        if(author.blocked){
+            return next(appErr('You are blocked Access Denied'));
+        }
         // 2. create a post
         const postCreated = await Post.create({
             title,
             description,
-            user: author._id
+            user: author._id,
+            category,
         });
         // Associat user to a post -Push the post into the user posts field
         author.posts.push(postCreated._id);
