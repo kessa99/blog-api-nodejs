@@ -1,14 +1,38 @@
-const commentCtrl = async(req, res) => {
+const Comment = require('../../models/Comment/Comment');
+const user = require('../../models/User/User');
+const post = require('../../models/Post/Post');
+const { appErr } = require('../../utils/appErr');
+
+// create
+const commentCtrl = async(req, res, next) => {
+    const { description } = req.body;
     try{
+        // find post
+        const post = await post.findById(req.params.id);
+        // creatte comment
+        const comment = await Comment.create({
+            // post: post._id,
+            post: req.params.id,
+            user: req.userAuth,
+            description
+        });
+        // find user
+        const user = await user.findById(req.userAuth);
+        // push the comment to post
+        post.comments.push(comment._id);
+        // push the comment to user
+        user.comments.push(comment._id);
+        // save
+        // disable validation
+        await post.save(validateBeforeSave = false);
+        await user.save(validateBeforeSave = false);
+
         res.json({
             status: 'success',
-            message: 'comment created successfully'
+            data: comment
         })
     } catch(err){
-        res.json({
-            status: 'Error in creating comment',
-            message: err.message
-        })
+        next(new appErr(err.message));
     }
 };
 
@@ -41,16 +65,24 @@ const commentGetAllCtrl = async(req, res) => {
 };
 
 const commentUpdateCtrl = async(req, res) => {
-    try{
+    const {description} = req.body;
+    try {
+        //find the comment
+        const comments = await Comment.findById(req.params.id);
+        if(comments.user.toString() !== req.userAuth) {
+            return next(appErr('You are not allowed to update this comment'));
+        }
+        const comment = await Comment.findByIdAndUpdate(
+            req.params.id, 
+            {description}, 
+            {new: true, runValidators: true},
+        )
         res.json({
             status: 'success',
-            message: 'comment updated successfully'
+            data: comment
         })
-    } catch(err){
-        res.json({
-            status: 'Error in updating comment',
-            message: err.message
-        })
+    } catch (err) {
+        return next(appErr(err.message))
     }
 };
 

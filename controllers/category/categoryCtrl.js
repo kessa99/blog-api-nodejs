@@ -44,7 +44,11 @@ const fetchCategoryCtrl = async (req, res) => {
 const categoryUpdateCtrl = async (req, res) => {
     const {title} = req.body;
     try {
-        const categories = await Category.findByIdAndUpdate(req.params.id, {title}, {new: true})
+        const categories = await Category.findByIdAndUpdate(
+            req.params.id, 
+            {title}, 
+            {new: true, runValidators: true},
+        )
         res.json({
             status: 'success',
             data: categories

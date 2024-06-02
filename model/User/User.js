@@ -53,6 +53,10 @@ const userSchema = new mongoose.Schema({
             ref: "User",
         },
     ],
+    comments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment',
+    }],
     posts: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -65,11 +69,11 @@ const userSchema = new mongoose.Schema({
             ref: "User",
         },
     ],
-    plan: {
-        type: String,
-        enum: ['Free', 'Premium', 'Pro'],
-        default: 'Free'
-    },
+    // plan: {
+    //     type: String,
+    //     enum: ['Free', 'Premium', 'Pro'],
+    //     default: 'Free'
+    // },
     userAward:{
         type: String,
         enum: ['Bronze', 'Silver', 'Gold'],
