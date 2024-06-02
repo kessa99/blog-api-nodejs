@@ -33,7 +33,7 @@ const createpostCtrl = async(req, res, next) => {
     }
 };
 
-const postGetOneCtrl = async(req, res) => {
+const postGetOneCtrl = async(req, res, next) => {
     try{
         res.json({
             status: 'success',
@@ -123,7 +123,7 @@ const toogleDisLikePostCtrl = async(req, res, next) => {
     }
 }
 // number of view post(details)
-const postDetailsCtrl = async(req, res) => {
+const postDetailsCtrl = async(req, res, next) => {
     try{
         // find the post
         const post = await Post.findById(req.params.id);
@@ -149,11 +149,29 @@ const postDetailsCtrl = async(req, res) => {
     }
 }
 
-const postUpdateCtrl = async(req, res) => {
+// updating
+const postUpdateCtrl = async(req, res, next) => {
+    const {title, description, category} = req.body;
     try{
+        // check if the post belongs to the user
+        //find the post
+        const post = await Post.findById(req.params.id);
+         // check if the post belongs to the user
+        if(post.user.toString() !== req.userAuth) {
+            return next(appErr('You are not allowed to updating this post'));
+        }
+        await Post.findByIdAndUpdate(req.params.id,{
+            title,
+            description,
+            category,
+            photo: req?.file?.path,
+        },
+        {
+            new: true,
+        });
         res.json({
             status: 'success',
-            message: 'post updated successfully'
+            message: 'post Updating successfully'
         })
     } catch(err){
         next(appErr(err.message));
@@ -161,11 +179,11 @@ const postUpdateCtrl = async(req, res) => {
 }
 
 // delete post
-const postDeleteCtrl = async(req, res) => {
+const postDeleteCtrl = async(req, res, next) => {
     try{
         // check if the post belongs to the user
         //find the post
-        const post = await Post.findByIdAndDelete(req.params.id);
+        const post = await Post.findById(req.params.id);
         if(post.user.toString() !== req.userAuth) {
             return next(appErr('You are not allowed to delete this post'));
         }

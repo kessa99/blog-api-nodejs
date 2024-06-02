@@ -3265,6 +3265,8 @@ j'obtiens alors le resultat esconter
 ## last days ago 
 ## upload image
 ## delete a post
+## updating of the post
+## comment api
 
 ```javascript
 ```

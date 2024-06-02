@@ -39,9 +39,9 @@ postRouter.get('dislike/:id' ,toogleDisLikePostCtrl);
 postRouter.get('detail/:id',isLogin ,postDetailsCtrl);
 
 //PUT/api/v1/posts/:id
-postRouter.put('/:id', postUpdateCtrl);
+postRouter.put('/:id',isLogin, postUpdateCtrl);
 
 //DELETE/api/v1/posts/:id
-postRouter.delete('/:id',isLogin ,postDeleteCtrl);
+postRouter.delete('/:id', isLogin, upload.single('image'), postDeleteCtrl);
 
 module.exports = postRouter;
