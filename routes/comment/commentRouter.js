@@ -14,16 +14,10 @@ const isLogin = require('../../middlewares/isLogin');
 //POST/api/v1/comments
 commentRouter.post('/:id', isLogin, commentCtrl);
 
-//GET/api/v1/comments/:id
-commentRouter.get('/:id', commentGetOneCtrl);
-
-//GET/api/v1/comments
-commentRouter.get('/', commentGetAllCtrl);
-
 //PUT/api/v1/users/:id
 commentRouter.put('/:id',isLogin, commentUpdateCtrl);
 
 //DELETE/api/v1/comments/:id
-commentRouter.delete('/:id', commentDeleteCtrl);
+commentRouter.delete('/:id',isLogin, commentDeleteCtrl);
 
 module.exports = commentRouter;

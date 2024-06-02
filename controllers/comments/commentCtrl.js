@@ -3,7 +3,7 @@ const user = require('../../models/User/User');
 const post = require('../../models/Post/Post');
 const { appErr } = require('../../utils/appErr');
 
-// create
+// create comment
 const commentCtrl = async(req, res, next) => {
     const { description } = req.body;
     try{
@@ -36,35 +36,8 @@ const commentCtrl = async(req, res, next) => {
     }
 };
 
-const commentGetOneCtrl = async(req, res) => {
-    try{
-        res.json({
-            status: 'success',
-            message: 'comment fetched successfully'
-        })
-    } catch(err){
-        res.json({
-            status: 'Error in fetching comment',
-            message: err.message
-        })
-    }
-};
-
-const commentGetAllCtrl = async(req, res) => {
-    try{
-        res.json({
-            status: 'success',
-            message: 'All comments fetched successfully'
-        })
-    } catch(err){
-        res.json({
-            status: 'Error in fetching all comments',
-            message: err.message
-        })
-    }
-};
-
-const commentUpdateCtrl = async(req, res) => {
+// update
+const commentUpdateCtrl = async(req, res, next) => {
     const {description} = req.body;
     try {
         //find the comment
@@ -72,6 +45,7 @@ const commentUpdateCtrl = async(req, res) => {
         if(comments.user.toString() !== req.userAuth) {
             return next(appErr('You are not allowed to update this comment'));
         }
+
         const comment = await Comment.findByIdAndUpdate(
             req.params.id, 
             {description}, 
@@ -86,25 +60,27 @@ const commentUpdateCtrl = async(req, res) => {
     }
 };
 
-const commentDeleteCtrl = async(req, res) => {
+// delete
+const commentDeleteCtrl = async(req, res, next) => {
     try{
+        //find the comment
+        const comments = await Comment.findById(req.params.id);
+        if(comments.user.toString() !== req.userAuth) {
+            return next(appErr('You are not allowed to update this comment'));
+        }
+        await comments.findByIdAndDelete(req.params.id);
         res.json({
             status: 'success',
             message: 'comment deleted successfully'
         })
     } catch(err){
-        res.json({
-            status: 'Error in deleting comment',
-            message: err.message
-        })
+        next(appErr(err.message));
     }
 };
 
 
 module.exports = {
     commentCtrl,
-    commentGetOneCtrl,
-    commentGetAllCtrl,
     commentUpdateCtrl,
     commentDeleteCtrl
 }
