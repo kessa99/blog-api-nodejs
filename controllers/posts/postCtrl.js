@@ -88,7 +88,34 @@ const toogleLikePostCtrl = async(req, res, next) => {
         }
         res.json({
             status: 'success',
-            data: 'like toogled successfully'
+            data: post
+        })
+    } catch(err){
+        next(appErr(err.message));
+    }
+}
+
+// toggle dislike
+const toogleDisLikePostCtrl = async(req, res, next) => {
+    try{
+        // get the post
+        const post = await Post.findById(req.params.id);
+        // check if the user has already unliked the post
+        const isUnLiked = post.dislikes.includes(req.userAuth);
+        // if the user has liked the post remove the like
+        if(isUnLiked){
+            // differnce between !== and !=
+            // post.likes = post.filter(like => like.toString() !== req.userAuth.toString());
+            post.dislikes = post.filter(dislike => dislike != req.userAuth);
+            await post.save();
+        } else {
+            // if the user has not liked the post add the like
+            post.dislikes.push(req.userAuth);
+            await post.save();
+        }
+        res.json({
+            status: 'success',
+            data: post
         })
     } catch(err){
         next(appErr(err.message));
@@ -124,4 +151,5 @@ module.exports = {
     postUpdateCtrl,
     postDeleteCtrl,
     toogleLikePostCtrl,
+    toogleDisLikePostCtrl,
 }
