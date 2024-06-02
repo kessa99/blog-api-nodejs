@@ -3255,6 +3255,7 @@ j'obtiens alors le resultat esconter
 ## Creation category
 ## All category
 ## single category
+## POST ENDPOINT
 
 ```javascript
 ```

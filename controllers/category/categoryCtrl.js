@@ -14,6 +14,7 @@ const CreateCategoryPost = async (req, res, next) => {
     }
 };
 
+// find one
 const categoryGetOneCtrl = async (req, res) => {
     try {
         const categories = await Category.findById(req.params.id)
@@ -26,6 +27,7 @@ const categoryGetOneCtrl = async (req, res) => {
     }
 };
 
+// find all
 const fetchCategoryCtrl = async (req, res) => {
     try {
         const categories = await Category.find()
@@ -38,6 +40,7 @@ const fetchCategoryCtrl = async (req, res) => {
     }
 };
 
+// update
 const categoryUpdateCtrl = async (req, res) => {
     const {title} = req.body;
     try {
@@ -51,8 +54,10 @@ const categoryUpdateCtrl = async (req, res) => {
     }
 };
 
-const categoryDelete = async (req, res) => {
+// delete
+const deleteCategoryCtrl = async (req, res) => {
     try {
+        await Category.findByIdAndDelete(req.params.id)
         res.json({
             status: 'success',
             message: 'category deleted successfully'
@@ -67,5 +72,5 @@ module.exports = {
     categoryGetOneCtrl,
     fetchCategoryCtrl,
     categoryUpdateCtrl,
-    categoryDelete
+    deleteCategoryCtrl
 }
