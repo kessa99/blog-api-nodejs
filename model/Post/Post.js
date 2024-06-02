@@ -40,9 +40,19 @@ const postSchema = new mongoose.Schema({
     },
     },
     {
-        timestamps: true
+        timestamps: true,
+        toJSON: {virtuals: true},
     }
 );
+
+// HOOK
+postSchema.pre(/^find/, async function(next){
+    //add views count as virtual field
+    postSchema.virtual('numViewsCount').get(function(){
+        return this.numViews.length;
+    });
+    next();
+});
 const Post = mongoose.model('Post', postSchema);
 
 module.exports = Post
