@@ -42,6 +42,6 @@ postRouter.get('detail/:id',isLogin ,postDetailsCtrl);
 postRouter.put('/:id', postUpdateCtrl);
 
 //DELETE/api/v1/posts/:id
-postRouter.delete('/:id', postDeleteCtrl);
+postRouter.delete('/:id',isLogin ,postDeleteCtrl);
 
 module.exports = postRouter;

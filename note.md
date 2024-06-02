@@ -3264,6 +3264,7 @@ j'obtiens alors le resultat esconter
 ## like percentage
 ## last days ago 
 ## upload image
+## delete a post
 
 ```javascript
 ```

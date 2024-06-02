@@ -160,8 +160,16 @@ const postUpdateCtrl = async(req, res) => {
     }
 }
 
+// delete post
 const postDeleteCtrl = async(req, res) => {
     try{
+        // check if the post belongs to the user
+        //find the post
+        const post = await Post.findByIdAndDelete(req.params.id);
+        if(post.user.toString() !== req.userAuth) {
+            return next(appErr('You are not allowed to delete this post'));
+        }
+        await Post.findByIdAndDelete(req.params.id);
         res.json({
             status: 'success',
             message: 'post deleted successfully'
