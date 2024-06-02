@@ -3263,6 +3263,7 @@ j'obtiens alors le resultat esconter
 ## number of view post
 ## like percentage
 ## last days ago 
+## upload image
 
 ```javascript
 ```

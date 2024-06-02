@@ -1,7 +1,11 @@
 const express = require('express');
 const isLogin = require('../../middlewares/isLogin');
+const storage = require('../../config/cloudinary');
 
 const postRouter = express.Router();
+
+// multer
+const multer = require('multer');
 
 const {
     createpostCtrl,
@@ -14,8 +18,10 @@ const {
     postDetailsCtrl,
 } = require('../../controllers/posts/postCtrl');
 
+// file upload middleware
+
 //POST/api/v1/posts
-postRouter.post('/',isLogin ,createpostCtrl);
+postRouter.post('/',isLogin,upload.single('image') ,createpostCtrl);
 
 //GET/api/v1/posts/:id
 postRouter.get('/:id', postGetOneCtrl);

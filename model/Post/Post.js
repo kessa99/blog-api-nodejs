@@ -36,13 +36,13 @@ const postSchema = new mongoose.Schema({
     },
     photo: {
         type: String,
-        default: 'default.jpg'
+        require: [true, 'Photo is required'],
     },
-    },
-    {
-        timestamps: true,
-        toJSON: {virtuals: true},
-    }
+},
+{
+    timestamps: true,
+    toJSON: {virtuals: true},
+}
 );
 
 // HOOK

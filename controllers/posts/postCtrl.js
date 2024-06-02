@@ -18,6 +18,7 @@ const createpostCtrl = async(req, res, next) => {
             description,
             user: author._id,
             category,
+            photo: req?.file?.path,
         });
         // Associat user to a post -Push the post into the user posts field
         author.posts.push(postCreated._id);
