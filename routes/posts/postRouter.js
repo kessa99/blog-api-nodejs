@@ -8,7 +8,8 @@ const {
     postGetOneCtrl,
     getAllPostCtrl,
     postUpdateCtrl,
-    postDeleteCtrl
+    postDeleteCtrl,
+    toogleLikePostCtrl,
 } = require('../../controllers/posts/postCtrl');
 
 //POST/api/v1/posts
@@ -19,6 +20,9 @@ postRouter.get('/:id', postGetOneCtrl);
 
 //GET/api/v1/posts
 postRouter.get('/',isLogin ,getAllPostCtrl);
+
+//POST/api/v1/posts
+postRouter.post('like/:id',isLogin ,toogleLikePostCtrl);
 
 //PUT/api/v1/posts/:id
 postRouter.put('/:id', postUpdateCtrl);

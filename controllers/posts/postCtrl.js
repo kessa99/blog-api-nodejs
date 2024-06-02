@@ -68,6 +68,33 @@ const getAllPostCtrl = async(req, res, next) => {
     }
 }
 
+// tooglelike
+const toogleLikePostCtrl = async(req, res, next) => {
+    try{
+        // get the post
+        const post = await Post.findById(req.params.id);
+        // check if the user has already liked the post
+        const isLiked = post.likes.includes(req.userAuth);
+        // if the user has liked the post remove the like
+        if(isLiked){
+            // differnce between !== and !=
+            // post.likes = post.filter(like => like.toString() !== req.userAuth.toString());
+            post.likes = post.filter(like => like != req.userAuth);
+            await post.save();
+        } else {
+            // if the user has not liked the post add the like
+            post.likes.push(req.userAuth);
+            await post.save();
+        }
+        res.json({
+            status: 'success',
+            data: 'like toogled successfully'
+        })
+    } catch(err){
+        next(appErr(err.message));
+    }
+}
+
 const postUpdateCtrl = async(req, res) => {
     try{
         res.json({
@@ -95,5 +122,6 @@ module.exports = {
     postGetOneCtrl,
     getAllPostCtrl,
     postUpdateCtrl,
-    postDeleteCtrl
+    postDeleteCtrl,
+    toogleLikePostCtrl,
 }
