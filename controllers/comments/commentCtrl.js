@@ -1,6 +1,6 @@
-const Comment = require('../../models/Comment/Comment');
-const user = require('../../models/User/User');
-const post = require('../../models/Post/Post');
+const Comment = require('../../model/Comment/Comment');
+const user = require('../../model/User/User');
+const post = require('../../model/Post/Post');
 const { appErr } = require('../../utils/appErr');
 
 // create comment

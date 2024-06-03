@@ -20,27 +20,29 @@ const userRegisterCtrl = async (req, res, next) => {
     } = req.body;
 
     try {
-    // Vérifier si l'utilisateur existe déjà
-    const userFound = await User.findOne({ email });
-    if (userFound) {
-        return next(new AppErr('User already exists', 404));
-    }
+        // Vérifier si l'utilisateur existe déjà
+        const userFound = await User.findOne({ email });
+        if (userFound) {
+            return next(new AppErr('User already exists'));
+        } else {
+            // Hacher le mot de passe
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Hacher le mot de passe
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+            // Créer un nouvel utilisateur
+            const user = await User.create({
+                firstname,
+                lastname,
+                email,
+                password: hashedPassword
+            });
 
-        // Créer un nouvel utilisateur
-        const user = await User.create({
-            firstname,
-            lastname,
-            email,
-            password: hashedPassword
-        });
-        return res.json({
-            status: 'succès',
-            data: user
-        });
+            // retourner une reponse valide
+            return res.json({
+                status: 'success',
+                data: user
+            });
+        }
     } catch (err) {
         next(appErr(err.message));
     }
@@ -222,7 +224,7 @@ const deleteUserAccountCtrl = async(req, res, next) => {
         //1.find the user to be deleted
         const userToBeDelete = await User.findById(req.userAuth);
         // 2.find all posts to be deleted
-        await Post.deleteMany({ user: req.userAuth });
+        // await Post.deleteMany({ user: req.userAuth });
         // 3.delete all comments of the user
         await Comment.deleteMany({ user: req.userAuth });
         // 4. delete all category of the user

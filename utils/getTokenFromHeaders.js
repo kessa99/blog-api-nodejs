@@ -1,9 +1,10 @@
-const getTokenFromHeader = req => {
+const getTokenFromHeader = (req) => {
     const headerObj = req.headers;
-    const token = headerObj['authorization'].split(' ')[1];
-
-    if (token !== undefined) {
-        return token;
+    const authorizationHeader = headerObj['authorization'];
+    
+    if (authorizationHeader) {
+        const token = authorizationHeader.split(' ')[1];
+        return token ? token : false;
     } else {
         return false;
     }

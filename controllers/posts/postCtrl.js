@@ -1,5 +1,5 @@
-const Post = require('../../models/Post/Post');
-const User = require('../../models/User/User');
+const Post = require('../../model/Post/Post');
+const User = require('../../model/User/User');
 
 
 // create a post

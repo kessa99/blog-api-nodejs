@@ -5,6 +5,11 @@ const { appErr } = require('../utils/appErr');
 
 const isAdmin = async (req, res, next) => {
     try {
+        // register not need token
+        if (req.path === '/api/v1/users/register') {
+            return next();
+        }
+        
         // Get token from header
         const token = getTokenFromHeader(req);
 

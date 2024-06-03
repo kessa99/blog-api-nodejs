@@ -6,6 +6,7 @@ const postRouter = express.Router();
 
 // multer
 const multer = require('multer');
+const upload = multer({ storage });
 
 const {
     createpostCtrl,
@@ -21,7 +22,7 @@ const {
 // file upload middleware
 
 //POST/api/v1/posts
-postRouter.post('/',isLogin,upload.single('image') ,createpostCtrl);
+postRouter.post('/', isLogin, upload.single('image'), createpostCtrl);
 
 //GET/api/v1/posts/:id
 postRouter.get('/:id', postGetOneCtrl);

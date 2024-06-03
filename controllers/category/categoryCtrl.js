@@ -1,4 +1,4 @@
-const Category = require('../../model/Category/Category')
+const Category = require('../../model/category/Category')
 const { appErr } = require('../../utils/appErr');
 
 const CreateCategoryPost = async (req, res, next) => {

@@ -47,6 +47,7 @@ app.use((req, res, next) => {
 
 
 
+
 // ROUTES
 app.use('/api/v1/users/', userRouter);
 app.use('/api/v1/posts/', postRouter);

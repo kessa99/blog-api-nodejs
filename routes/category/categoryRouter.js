@@ -6,9 +6,8 @@ const {
     fetchCategoryCtrl,
     categoryUpdateCtrl,
     deleteCategoryCtrl,
-    fetchCategoryCtrl
 } = require('../../controllers/category/categoryCtrl');
-isLogin = require('../../middleware/isLogin');
+isLogin = require('../../middlewares/isLogin');
 
 //POST/api/v1/category
 categoryRouter.post('/', CreateCategoryPost);
