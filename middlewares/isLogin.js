@@ -11,6 +11,7 @@ const isLogin = (req, res, next) => {
 
     //save the user data in req.user
     req.userAuth = decodedUser.id;
+    console.log('isLogin id is:', decodedUser.id);
 
     if (!decodedUser) {
         return next(appErr('Invalid/Expired token. Please login again', 500))

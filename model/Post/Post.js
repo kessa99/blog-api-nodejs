@@ -88,6 +88,6 @@ postSchema.pre(/^find/, async function(next){
     });
     next();
 });
-const Post = mongoose.model('Post', postSchema);
+const post = mongoose.model('Post', postSchema);
 
-module.exports = Post
+module.exports = post

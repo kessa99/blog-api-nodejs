@@ -1,8 +1,9 @@
 const express = require('express');
+
 const {
     userRegisterCtrl,
     userLoginCtrl,
-    userGetOneCtrl,
+    userProfileCtrl,
     userGetAllCtrl,
     updateUserCtrl,
     deleteUserAccountCtrl,
@@ -17,6 +18,7 @@ const {
     adminUnBlockUserCtrl,
     updatePassewordUserCtrl,
 } = require('../../controllers/users/userCtrl');
+
 const storage = require('../../config/cloudinary');
 
 const multer = require('multer');
@@ -29,19 +31,19 @@ const userRouter = express.Router();
 const upload = multer({ storage })
 
 //POST/api/v1/users/register
-userRouter.post('/register', userRegisterCtrl);
+userRouter.post('/registration/', userRegisterCtrl);
 
 //POST/api/v1/users/login
 userRouter.post('/login', userLoginCtrl);
 
-//GET/api/v1/users/:id
-userRouter.get('/profile/', isLogin, userGetOneCtrl);
+//GET/api/v1/users/profile/
+userRouter.get('/profile/', isLogin, userProfileCtrl);
 
-//GET/api/v1/users
-userRouter.get('/', userGetAllCtrl);
+//GET/api/v1/users/all/
+userRouter.get('/all', isLogin, userGetAllCtrl);
 
 //PUT/api/v1/users/
-userRouter.put('/delete-account',isLogin , updateUserCtrl);
+userRouter.put('/update-account',isLogin , updateUserCtrl);
 
 //PUT PASSWORD/api/v1/users/
 userRouter.put('/update-password',isLogin , updatePassewordUserCtrl);
@@ -75,5 +77,6 @@ userRouter.get('/admin-block/:id',isLogin ,isAdmin , adminBlockUserCtrl);
 
 //PUT/api/v1/users/admin-unblock/id
 userRouter.put('/admin-unblock/:id',isLogin, isAdmin , adminUnBlockUserCtrl);
+
 
 module.exports = userRouter

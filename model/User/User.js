@@ -1,19 +1,20 @@
 const mongoose = require('mongoose');
+const Post = require('../Post/Post')
 // create a schema
 
 
 const userSchema = new mongoose.Schema({
     firstname: {
         type: String,
-        required:[true, 'First name is required']
+        required: [true, 'First name is required']
     },
     lastname: {
         type: String,
-        required:[true, 'Last name is required']
+        required: [true, 'Last name is required']
     },
     email: {
         type: String,
-        required:[true, 'Email is required']
+        required: [true, 'Email is required']
     },
     profilePhoto: {
         type: String,
@@ -21,7 +22,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required:[true, 'Password is required']
+        required: [true, 'Password is required']
     },
     isBlocked: {
         type: Boolean,
@@ -33,7 +34,9 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['Admin', 'Guest', 'Editor']
+        enum: ['Admin', 'Guest', 'Editor'],
+        required: [true, 'role is required'],
+        default: 'Editor'
     },
     viewers: [
         {
@@ -74,21 +77,21 @@ const userSchema = new mongoose.Schema({
     //     enum: ['Free', 'Premium', 'Pro'],
     //     default: 'Free'
     // },
-    userAward:{
+    userAward: {
         type: String,
         enum: ['Bronze', 'Silver', 'Gold'],
         default: 'Bronze'
     }
 },
-{
-    timestamps: true,
-    toJSON: { virtuals: true },
-}
+    {
+        timestamps: true,
+        toJSON: { virtuals: true },
+    }
 
 );
 // HOOKS
 // PRE-BEFORE RECORD IS SAVED
-userSchema.pre('findOne', async function(next) {
+userSchema.pre('findOne', async function (next) {
     try {
         // populate the post
         this.populate({
@@ -111,7 +114,7 @@ userSchema.pre('findOne', async function(next) {
         const lastPostDateString = lastPostDate.toDateString();
 
         // add virtuals to the schema
-        userSchema.virtual('lastPost').get(function() {
+        userSchema.virtual('lastPost').get(function () {
             return lastPostDateString;
         });
 
@@ -120,26 +123,26 @@ userSchema.pre('findOne', async function(next) {
         const diff = currentDate - lastPostDate;
         const diffInDays = diff / (1000 * 60 * 60 * 24);
 
-        if (diffInDays > 30) {
-            // set the user to inactive
-            userSchema.virtual('isInActive').get(function() {
-                return true;
-            });
-            // find the user by id and set the user to inactive
-            await User.findByIdAndUpdate(userId, { isBlocked: true }, { new: true, runValidators: true });
-        } else {
-            userSchema.virtual('isInActive').get(function() {
-                return false;
-            });
-            // find the user by id and set the user to inactive
-            await User.findByIdAndUpdate(userId, { isBlocked: true }, { new: true, runValidators: true });
-        }
+        // if (diffInDays > 30) {
+        //     // set the user to inactive
+        //     userSchema.virtual('isInActive').get(function () {
+        //         return true;
+        //     });
+        //     // find the user by id and set the user to inactive
+        //     await User.findByIdAndUpdate(userId, { isBlocked: true }, { new: true, runValidators: true });
+        // } else {
+        //     userSchema.virtual('isInActive').get(function () {
+        //         return false;
+        //     });
+        //     // find the user by id and set the user to inactive
+        //     await User.findByIdAndUpdate(userId, { isBlocked: true }, { new: true, runValidators: true });
+        // }
 
         // Last active Date
         const daysAgo = Math.floor(diffInDays);
 
         // add virtual to the schema
-        userSchema.virtual('lastActive').get(function() {
+        userSchema.virtual('lastActive').get(function () {
             // check if  daysAgo is less than 0
             if (daysAgo < 0) {
                 return 'Today';
@@ -177,38 +180,38 @@ userSchema.pre('findOne', async function(next) {
 
 
 // GET FULLNAME
-userSchema.virtual('fullname').get(function(){
+userSchema.virtual('fullname').get(function () {
     return `${this.firstname} ${this.lastname}`;
 });
 
 // get post count
-userSchema.virtual('initials').get(function(){
+userSchema.virtual('initials').get(function () {
     return this.posts.length;
 });
 
 
 // GET USER INITIALS
-userSchema.virtual('postCounts').get(function(){
+userSchema.virtual('postCounts').get(function () {
     return `${this.firstname[0]}${this.lastname[0]}`;
 });
 
 // get followers count 
-userSchema.virtual('followersCount').get(function(){
+userSchema.virtual('followersCount').get(function () {
     return this.followers.length;
 });
 
 // get following count 
-userSchema.virtual('followersCount').get(function(){
+userSchema.virtual('followersCount').get(function () {
     return this.following.length;
 });
 
 // get viewers count 
-userSchema.virtual('viewersCount').get(function(){
+userSchema.virtual('viewersCount').get(function () {
     return this.viewers.length;
 });
 
 // get blocked count
-userSchema.virtual('blockCount').get(function(){
+userSchema.virtual('blockCount').get(function () {
     return this.blocked.length;
 });
 
