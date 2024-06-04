@@ -11,12 +11,9 @@ const dotenv = require('dotenv');
 //import routes
 // ./routes/users/userRoutes.js
 const userRouter = require('./routes/users/userRoutes');
-// const userRouter = require('./routes/users/userRoutes');
 const postRouter = require('./routes/posts/postRouter');
 const commentRouter = require('./routes/comment/commentRouter');
 const categoryRouter = require('./routes/category/categoryRouter');
-const isAdmin = require('./middlewares/isAdmin');
-const isLogin = require('./middlewares/isLogin');
 
 const globalErrorHandler = require('./middlewares/globalErrorHandler');
 
@@ -25,25 +22,22 @@ require('./config/dbConnect');
 const app = express();
 
 // middleware
-
-
 app.use(express.json());
-app.use(isAdmin);
 
-const userAuth = {
-    isLogin: true,
-    isAdmin: false,
-}
+// const userAuth = {
+//     isLogin: true,
+//     isAdmin: false,
+// }
 
-app.use((req, res, next) => {
-    if (userAuth.isLogin) {
-        next();
-    } else {
-        res.json({
-            message: 'You are not login'
-        });
-    }
-});
+// app.use((req, res, next) => {
+//     if (userAuth.isLogin) {
+//         next();
+//     } else {
+//         res.json({
+//             message: 'You are not login'
+//         });
+//     }
+// });
 
 
 

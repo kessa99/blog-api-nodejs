@@ -2,13 +2,13 @@ const User = require('../../model/User/User');
 const bcrypt = require('bcrypt');
 const generateToken = require('../../utils/generateToken');
 const getTokenFromHeader = require('../../utils/getTokenFromHeaders');
-const { appErr, AppErr } = require('../../utils/appErr');
+const { appErr } = require('../../utils/appErr');
 const storage = require('../../config/cloudinary');
 const multer = require('multer');
 const Post = require('../../model/Post/Post');
 const Category = require('../../model/category/Category');
 const Comment = require('../../model/Comment/Comment');
-// ---------------------- Users ----------------------------------
+
 
 // register
 const userRegisterCtrl = async (req, res, next) => {
@@ -16,14 +16,15 @@ const userRegisterCtrl = async (req, res, next) => {
         firstname,
         lastname,
         email,
-        password
+        password,
+        role
     } = req.body;
 
     try {
         // Vérifier si l'utilisateur existe déjà
         const userFound = await User.findOne({ email });
         if (userFound) {
-            return next(new AppErr('User already exists'));
+            return next(appErr('User already exists'));
         } else {
             // Hacher le mot de passe
             const salt = await bcrypt.genSalt(10);
@@ -34,9 +35,10 @@ const userRegisterCtrl = async (req, res, next) => {
                 firstname,
                 lastname,
                 email,
-                password: hashedPassword
+                password: hashedPassword,
+                role
             });
-
+            console.log('tout es ok');
             // retourner une reponse valide
             return res.json({
                 status: 'success',
@@ -44,10 +46,11 @@ const userRegisterCtrl = async (req, res, next) => {
             });
         }
     } catch (err) {
-        next(appErr(err.message));
+        console.log('Rien ne marche');
+        // next(appErr(err.message));
+        console.log(err)
     }
 };
-
 
 // login
 const userLoginCtrl = async(req, res, next) => {
@@ -74,6 +77,8 @@ const userLoginCtrl = async(req, res, next) => {
                 lastname: userFound.lastname,
                 email: userFound.email,
                 isAdmin: userFound.isAdmin,
+                isBlocked: userFound.isBlocked,
+                role: userFound.role,
                 token: generateToken(userFound._id)
             },
         })
@@ -83,7 +88,7 @@ const userLoginCtrl = async(req, res, next) => {
 };
 
 // get one user(Profile)
-const userGetOneCtrl = async(req, res) => {
+const userProfileCtrl = async(req, res, next) => {    
     try{
         const user = await User.findById(req.userAuth);
         res.json({
@@ -92,9 +97,9 @@ const userGetOneCtrl = async(req, res) => {
         })
     } catch(err){
         next(appErr(err.message));
+        console.log(err.message);
     }
 }
-
 
 // get all user
 const userGetAllCtrl = async(req, res) => {
@@ -145,8 +150,6 @@ const updateUserCtrl = async (req, res, next) => {
     }
 };
 
-
-// ---------------------- Updating password ----------------------------------
 // update user
 const updatePassewordUserCtrl = async(req, res, next) => {
     const { password } = req.body;
@@ -184,6 +187,7 @@ const profilePhototoUploadCtrl = async(req, res, next) => {
     // console.log(req.file);
     // 1.find the user to be updated
     const userToUpdate = await User.findById(req.userAuth);
+    console.log(userToUpdate.isBlocked);
     // 2.check if user is found
     if(!userToUpdate){
         return next(appErr('User not found', 404));
@@ -217,29 +221,28 @@ const profilePhototoUploadCtrl = async(req, res, next) => {
     }
 };
 
-
 // delete user
 const deleteUserAccountCtrl = async(req, res, next) => {
     try{
         //1.find the user to be deleted
         const userToBeDelete = await User.findById(req.userAuth);
         // 2.find all posts to be deleted
-        // await Post.deleteMany({ user: req.userAuth });
+        await Post.deleteMany({ user: req.userAuth });
         // 3.delete all comments of the user
         await Comment.deleteMany({ user: req.userAuth });
         // 4. delete all category of the user
         await Category.deleteMany({ user: req.userAuth });
         // 5.delete
-        await userToBeDelete.delete();
+        userToBeDelete.delete();
         res.json({
             status: 'success',
             message: 'Profile delete successfully'
         })
     } catch(err){
         next(appErr(err.message));
+        console.log(err.message);
     }
 };
-
 
 // logout
 const userLogoutCtrl = async(req, res) => {
@@ -252,9 +255,6 @@ const userLogoutCtrl = async(req, res) => {
         next(appErr(err.message));
     }
 }
-
-
-// ---------------------- Users-Viewers ----------------------------------
 
 // who view my profile
 const whoViewMyProfileCtrl = async(req, res, next) => {
@@ -288,7 +288,6 @@ const whoViewMyProfileCtrl = async(req, res, next) => {
     }
 };
 
-// ---------------------- Users-follows and followers ----------------------------------
 // followings users
 const followingCtrl = async(req, res, next) => {
     try{
@@ -326,7 +325,6 @@ const followingCtrl = async(req, res, next) => {
     }
 };
 
-// ---------------------- Users-Unfollows ----------------------------------
 // Unfollow Controller
 const unFollowCtrl = async(req, res, next) => {
     try{
@@ -367,7 +365,6 @@ const unFollowCtrl = async(req, res, next) => {
     }
 };
 
-// ---------------------- Users-Blocked ----------------------------------
 // Block Controller
 const blockUsersCtrl = async (req, res, next) => {
     try {
@@ -406,7 +403,6 @@ const blockUsersCtrl = async (req, res, next) => {
     }
 };
 
-// ---------------------- Users-unBlocked ----------------------------------
 // unBlocked
 const unBlockUserCtrl = async(req, res, next) => {
     try{
@@ -443,7 +439,6 @@ const unBlockUserCtrl = async(req, res, next) => {
     }
 };
 
-// ---------------------- admin-Blocked user----------------------------------
 // admin-block
 const adminBlockUserCtrl = async(req, res, next) => {
     try{
@@ -467,7 +462,6 @@ const adminBlockUserCtrl = async(req, res, next) => {
     }
 }
 
-// ---------------------- admin-UnBlocked user----------------------------------
 // admin-unblock
 const adminUnBlockUserCtrl = async(req, res, next) => {
     try{
@@ -498,7 +492,7 @@ const adminUnBlockUserCtrl = async(req, res, next) => {
 module.exports = {
     userRegisterCtrl,
     userLoginCtrl,
-    userGetOneCtrl,
+    userProfileCtrl,
     userGetAllCtrl,
     deleteUserAccountCtrl,
     updateUserCtrl,
