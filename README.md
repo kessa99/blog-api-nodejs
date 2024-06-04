@@ -5,6 +5,7 @@ __Server:__ Node, Express, MongoDB, Mongoose, JWT
 ## AUTHORS
 - [@kessa99](https://github.com/kessa99)
 - [@Mela-nina](htts://github.com/Mela-nina)
+- [@chenebuah-david] (https://github.com/chenebuah-david)
 
 # API FEATURES
 - Authentication and autorization
