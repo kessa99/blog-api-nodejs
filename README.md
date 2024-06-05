@@ -823,7 +823,7 @@ To access this feature, you need to provide your authentication token in the req
 }
 ```
 
-The response confirms that you have successfully blocked the user. Additionally, it provides the updated user object with the `blocked` array containing the ID of the user who was blocked, indicating that this user is now blocked.
+The response confirms that you have successfully blocked the user. Additionally, it provides the updated user object with the `blocked` array containing the ID of the user who was blocked, indicating that this user is now blocked  and increments the `blockCount` field by `1`.
 
 
 Sure! Here's the documentation for the "User Unblock User" feature:
@@ -893,3 +893,140 @@ To access this feature, you need to provide your authentication token in the req
 
 The response confirms that you have successfully unblocked the user. Additionally, it provides the updated user object with the `blocked` array now empty, indicating that this user is no longer blocked.
 
+Certainly! Here's the documentation for the "Admin Block User" feature:
+
+## ADMIN BLOCK USER
+
+This feature allows an admin user to block a regular user by providing the ID of that user in the URL.
+
+* **URL**
+```
+GET /api/v1/users/admin-block/:id
+```
+
+**Explanation**
+
+To access this feature, the authenticated user must have admin privileges and provide their authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **Admin's authentication token**       |  **yes**       |
+| `:id`             | `string`     | **The ID of the user to be blocked**   | **yes**       |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"message": "User has been successfully blocked by the admin"
+}
+```
+
+* **Response with Updated User Object**
+```javascript
+{
+	"status": "success",
+	"data": {
+		"_id": "665ef38b693724e3e8356aca",
+		"firstname": "David",
+		"lastname": "Chaka",
+		"email": "chaka@gmail.com",
+		"profilePhoto": "default.jpg",
+		"password": "$2b$10$0q2sBRleZhl.cVo1IjXN1OYmd2b5nj57LlQ8bQwrO84ibDIzY7kNq",
+		"isBlocked": true,
+		"isAdmin": false,
+		"role": "Editor",
+		"viewers": [
+			"6660b4471a85e6f2b8944d38"
+		],
+		"followers": [],
+		"following": [],
+		"comments": [],
+		"posts": [],
+		"blocked": [],
+		"userAward": "Bronze",
+		"createdAt": "2024-06-04T10:59:23.521Z",
+		"updatedAt": "2024-06-05T19:46:58.185Z",
+		"__v": 3,
+		"fullname": "David Chaka",
+		"initials": 0,
+		"postCounts": "DC",
+		"followersCount": 0,
+		"viewersCount": 1,
+		"blockCount": 0,
+		"id": "665ef38b693724e3e8356aca",
+		"lastPost": "Invalid Date",
+		"lastActive": null
+	}
+}
+```
+
+The response confirms that the admin user has successfully blocked the regular user. Additionally, it provides the updated user object with the `isBlocked` field set to `true`.
+
+Sure! Here's the documentation for the "Admin Unblock User" feature:
+
+## ADMIN UNBLOCK USER
+
+This feature allows an admin user to unblock a blocked user by providing the ID of that user in the URL.
+
+* **URL**
+```
+GET /api/v1/users/admin-unblock/:id
+```
+
+**Explanation**
+
+To access this feature, the authenticated user must have admin privileges and provide their authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **Admin's authentication token**       |  **yes**       |
+| `:id`             | `string`     | **The ID of the user to be unblocked** | **yes**       |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"message": "User has been successfully unblocked by the admin"
+}
+```
+
+* **Response with Updated User Object**
+```javascript
+{
+	"status": "success",
+	"data": {
+		"_id": "665ef38b693724e3e8356aca",
+		"firstname": "David",
+		"lastname": "Chaka",
+		"email": "chaka@gmail.com",
+		"profilePhoto": "default.jpg",
+		"password": "$2b$10$0q2sBRleZhl.cVo1IjXN1OYmd2b5nj57LlQ8bQwrO84ibDIzY7kNq",
+		"isBlocked": false,
+		"isAdmin": false,
+		"role": "Editor",
+		"viewers": [
+			"6660b4471a85e6f2b8944d38"
+		],
+		"followers": [],
+		"following": [],
+		"comments": [],
+		"posts": [],
+		"blocked": [],
+		"userAward": "Bronze",
+		"createdAt": "2024-06-04T10:59:23.521Z",
+		"updatedAt": "2024-06-05T19:55:17.258Z",
+		"__v": 3,
+		"fullname": "David Chaka",
+		"initials": 0,
+		"postCounts": "DC",
+		"followersCount": 0,
+		"viewersCount": 1,
+		"blockCount": 0,
+		"id": "665ef38b693724e3e8356aca",
+		"lastPost": "Invalid Date",
+		"lastActive": null
+	}
+}
+```
+
+The response confirms that the admin user has successfully unblocked the previously blocked user. Additionally, it provides the updated user object with the `isBlocked` field set to `false` and `blockCount` field reset to `0`.

@@ -457,7 +457,7 @@ const adminBlockUserCtrl = async(req, res, next) => {
         await userToBeBlocked.save();
         res.json({
             status: 'success',
-            message: 'You are successuffly blocked this user'
+            message: 'User has been successfully blocked by the admin'
         })
     } catch(err){
         next(appErr(err.message));
@@ -480,7 +480,7 @@ const adminUnBlockUserCtrl = async(req, res, next) => {
         await userToUnBeBlocked.save();
         res.json({
             status: 'success',
-            message: 'You are successuffly unblocked this user'
+            message: 'Admin has successuffly unblocked this user'
         })
     } catch(err){
         next(appErr(err.message));
