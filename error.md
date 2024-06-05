@@ -246,3 +246,30 @@ Bien sûr! Voici un guide détaillé pour installer Node.js en utilisant `nvm` (
    ```
 
 En suivant ces étapes, vous devriez être en mesure d'installer et de gérer efficacement Node.js avec `nvm` sur votre machine.
+
+
+D'accord, dans ce cas, voici le problème que j'ai identifié et les détails de la solution :
+
+### Problème Résolu :
+
+#### Problème :
+L'utilisateur n'était pas correctement supprimé de la base de données malgré l'utilisation de `deleteOne()`.
+
+#### Détails de la Solution :
+
+1. **Utilisation de la Méthode de Suppression Appropriée :**
+   - J'ai identifié que `deleteOne()` n'était pas correctement utilisé pour supprimer l'utilisateur. Cette méthode est la bonne pour supprimer un document dans Mongoose.
+  
+2. **Ajout de Logs pour le Débogage :**
+   - J'ai ajouté des logs dans le contrôleur de suppression pour suivre chaque étape du processus de suppression. Cela a permis de vérifier si l'utilisateur était trouvé et supprimé correctement.
+
+3. **Vérification du Middleware d'Authentification :**
+   - J'ai supposé que `req.userAuth` était correctement défini par le middleware d'authentification. Si ce n'était pas le cas, cela aurait pu entraîner l'échec de la suppression de l'utilisateur. Il est important de vérifier que le middleware d'authentification fonctionne correctement et définit `req.userAuth` avec l'identifiant de l'utilisateur.
+
+4. **Vérification des Conditions de Suppression :**
+   - J'ai vérifié que les critères de suppression étaient corrects pour s'assurer que les documents associés à l'utilisateur étaient bien supprimés. Si ces critères ne sont pas corrects, cela aurait pu entraîner la persistance des documents associés dans la base de données.
+
+5. **Test et Vérification :**
+   - J'ai recommandé de tester à nouveau la fonction de suppression après avoir apporté les modifications pour s'assurer que l'utilisateur est bien supprimé de la base de données.
+
+En suivant ces étapes, nous avons pu identifier et résoudre le problème qui empêchait la suppression correcte de l'utilisateur dans la base de données.
