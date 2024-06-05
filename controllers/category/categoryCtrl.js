@@ -2,7 +2,7 @@ const Category = require('../../model/category/Category')
 const { appErr } = require('../../utils/appErr');
 
 const CreateCategoryPost = async (req, res, next) => {
-    const {} = req.body;
+    const { title } = req.body;
     try {
         const category = await Category.create({title, user: req.userAuth})
         res.json({
@@ -15,7 +15,7 @@ const CreateCategoryPost = async (req, res, next) => {
 };
 
 // find one
-const categoryGetOneCtrl = async (req, res) => {
+const categoryGetOneCtrl = async (req, res, next) => {
     try {
         const categories = await Category.findById(req.params.id)
         res.json({

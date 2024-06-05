@@ -969,7 +969,7 @@ Sure! Here's the documentation for the "Admin Unblock User" feature:
 This feature allows an admin user to unblock a blocked user by providing the ID of that user in the URL.
 
 * **URL**
-```
+```javascript
 GET /api/v1/users/admin-unblock/:id
 ```
 
@@ -1030,3 +1030,187 @@ To access this feature, the authenticated user must have admin privileges and pr
 ```
 
 The response confirms that the admin user has successfully unblocked the previously blocked user. Additionally, it provides the updated user object with the `isBlocked` field set to `false` and `blockCount` field reset to `0`.
+
+
+## Create Category
+
+* **URL**
+```
+POST /api/v1/category/
+```
+
+**Explanation**
+
+To create a new category for articles, the admin must provide their authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **Token of the admin creating the category** |  **yes**       |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"data": {
+		"user": "6660b4471a85e6f2b8944d38",
+		"title": "html",
+		"_id": "6660dbaeded46a7a779ef9f2",
+		"createdAt": "2024-06-05T21:42:06.234Z",
+		"updatedAt": "2024-06-05T21:42:06.234Z",
+		"__v": 0
+	}
+}
+```
+
+This endpoint allows an admin to create a new category for articles. Upon successful creation, the server returns the details of the newly created category, including the user who created it, the title of the category, and its unique ID, along with timestamps for creation and update.
+
+
+Here's the documentation for fetching a category by its ID:
+
+## Get Category by ID
+
+* **URL**
+```
+GET /api/v1/category/:id
+```
+
+**Explanation**
+
+To retrieve a category by its ID, the user must provide their authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **User's authentication token**        |  **yes**       |
+| `:id`             | `string`     | **ID of the category to retrieve**      | **yes**       |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"data": {
+		"_id": "6660dbaeded46a7a779ef9f2",
+		"user": "6660b4471a85e6f2b8944d38",
+		"title": "html",
+		"createdAt": "2024-06-05T21:42:06.234Z",
+		"updatedAt": "2024-06-05T21:42:06.234Z",
+		"__v": 0
+	}
+}
+```
+
+This endpoint allows a user to retrieve a category by its ID. Upon successful retrieval, the server returns the details of the category, including the user who created it, the title of the category, its unique ID, and timestamps for creation and update.
+
+
+Here's the documentation for fetching all categories:
+
+## Get All Categories
+
+* **URL**
+```
+GET /api/v1/category/
+```
+
+**Explanation**
+
+To retrieve all categories, the user must provide their authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **User's authentication token**        |  **yes**       |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"data": [
+		{
+			"_id": "6660dbaeded46a7a779ef9f2",
+			"user": "6660b4471a85e6f2b8944d38",
+			"title": "html",
+			"createdAt": "2024-06-05T21:42:06.234Z",
+			"updatedAt": "2024-06-05T21:42:06.234Z",
+			"__v": 0
+		},
+		{
+			"_id": "6660dd96ecb84735db6b1dcf",
+			"user": "6660b4471a85e6f2b8944d38",
+			"title": "Car",
+			"createdAt": "2024-06-05T21:50:14.521Z",
+			"updatedAt": "2024-06-05T21:50:14.521Z",
+			"__v": 0
+		}
+	]
+}
+```
+
+This endpoint allows a user to retrieve all categories. Upon successful retrieval, the server returns a list of categories, each containing details such as the user who created it, the title of the category, its unique ID, and timestamps for creation and update.
+
+
+
+## Update Category
+
+* **URL**
+```
+PUT /api/v1/category/:id
+```
+
+**Explanation**
+
+To update a category, the admin must provide their authentication token in the request header and the ID of the category to be updated in the URL. The new category data should be included in the request body.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **Admin's authentication token**        |  **yes**       |
+| `:id`             | `string`     | **ID of the category to update**        | **yes**        |
+| `title`           | `string`     | **New title of the category**           | **no**         |
+
+* **Request Body Example**
+```javascript
+{
+	"title": "Love"
+}
+```
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"data": {
+		"_id": "6660dbaeded46a7a779ef9f2",
+		"user": "6660b4471a85e6f2b8944d38",
+		"title": "Love",
+		"createdAt": "2024-06-05T21:42:06.234Z",
+		"updatedAt": "2024-06-05T22:23:14.190Z",
+		"__v": 0
+	}
+}
+```
+
+This endpoint allows an admin to update the details of an existing category. Upon successful update, the server returns the updated details of the category, including the user who created it, the new title of the category, its unique ID, and updated timestamps.
+
+
+## Delete Category
+
+* **URL**
+```
+DELETE /api/v1/category/:id
+```
+
+**Explanation**
+
+To delete a category, the admin must provide their authentication token in the request header and the ID of the category to be deleted in the URL.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **Admin's authentication token**        |  **yes**       |
+| `:id`             | `string`     | **ID of the category to delete**        | **yes**        |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"message": "Category successfully deleted"
+}
+```
+
+This endpoint allows an admin to delete an existing category. Upon successful deletion, the server returns a confirmation message indicating that the category has been successfully deleted.

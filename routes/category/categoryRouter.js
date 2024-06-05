@@ -10,10 +10,10 @@ const {
 isLogin = require('../../middlewares/isLogin');
 
 //POST/api/v1/category
-categoryRouter.post('/', CreateCategoryPost);
+categoryRouter.post('/', isLogin, CreateCategoryPost);
 
 //GET/api/v1/category/:id
-categoryRouter.get('/:id', categoryGetOneCtrl);
+categoryRouter.get('/:id',isLogin ,categoryGetOneCtrl);
 
 //GET/api/v1/category
 categoryRouter.get('/', fetchCategoryCtrl);
