@@ -273,3 +273,34 @@ L'utilisateur n'était pas correctement supprimé de la base de données malgré
    - J'ai recommandé de tester à nouveau la fonction de suppression après avoir apporté les modifications pour s'assurer que l'utilisateur est bien supprimé de la base de données.
 
 En suivant ces étapes, nous avons pu identifier et résoudre le problème qui empêchait la suppression correcte de l'utilisateur dans la base de données.
+
+
+
+Voici comment je formulerai cette erreur en fonction de vos instructions :
+
+### Erreur Git lors de la commande `git pull --rebase origin main` :
+
+#### Type d'Erreur :
+L'erreur survient lors de l'exécution de la commande `git pull --rebase origin main` en raison de modifications non validées dans votre répertoire de travail local.
+
+#### Description de l'Erreur :
+Git ne peut pas effectuer un rébase car vous avez des modifications non validées dans votre répertoire de travail local. Pour effectuer un rébase, toutes les modifications doivent être validées ou mises de côté.
+
+#### Solutions :
+
+1. **Valider les Modifications :**
+   Validez vos modifications en exécutant la commande `git add` pour ajouter les fichiers modifiés à l'index, puis exécutez `git commit` pour créer un nouveau commit avec ces modifications.
+
+   ```
+   git add <fichier>
+   git commit -m "Message de commit"
+   ```
+
+2. **Mettre de Côté les Modifications :**
+   Si vous ne souhaitez pas valider les modifications immédiatement, vous pouvez les mettre de côté en utilisant la commande `git stash`. Cela enregistrera temporairement les modifications dans une pile de stash, permettant ainsi d'effectuer le rébase.
+
+   ```
+   git stash
+   ```
+
+Une fois que vous avez validé ou mis de côté les modifications, vous pourrez ensuite exécuter à nouveau la commande `git pull --rebase origin main` pour effectuer le rébase avec succès.

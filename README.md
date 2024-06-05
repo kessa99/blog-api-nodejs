@@ -539,6 +539,7 @@ Delete /api/v1/users/:id
 | Parameter         | Type         | Description           | Required       |
 | :-----------------| :------------| :---------------------| :--------------|
 | `authentication`  | `string`     | **Your token**        |  **yes**       |
+| `:id`             | `string`     | **The ID of the user to delete** | **yes**      |
 
 
 * Response
@@ -550,5 +551,32 @@ Delete /api/v1/users/:id
 }
 ```
 
-## USER BLOCK USER
+Sure! Here's a simplified and explanatory version of your documentation for the "View My Profile" feature:
+
+## VIEW MY PROFILE
+
+* **URL**
+```
+GET /api/v1/users/who-view-my-profile/:id
+```
+
+**Explanation**
+
+To access this feature, you need to provide your authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **Your authentication token**           |  **yes**       |
+| `:id`             | `string`     | **The ID of the user whose profile you want to view** | **yes**      |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"data": "You have successfully viewed this profile"
+}
+```
+
+When you access this URL with the ID of the user you want to view the profile of, you'll receive a confirmation indicating that you have successfully viewed the profile.
+
 
