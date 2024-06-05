@@ -552,3 +552,6 @@ Delete /api/v1/users/:id
 	"message": "User deleted successfully"
 }
 ```
+
+## USER BLOCK USER
+

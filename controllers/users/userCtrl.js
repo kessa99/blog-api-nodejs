@@ -225,6 +225,7 @@ const profilePhototoUploadCtrl = async(req, res, next) => {
 const deleteUserAccountCtrl = async(req, res, next) => {
     try{
         //1.find the user to be deleted
+        const users = await User.find();
         const userToBeDelete = await User.findById(req.userAuth);
         // 2.find all posts to be deleted
         await Post.deleteMany({ user: req.userAuth });
@@ -233,10 +234,10 @@ const deleteUserAccountCtrl = async(req, res, next) => {
         // 4. delete all category of the user
         await Category.deleteMany({ user: req.userAuth });
         // 5.delete
-        userToBeDelete.delete();
+        await User.deleteOne({ _id: req.userAuth });
         res.json({
             status: 'success',
-            message: 'Profile delete successfully'
+            message : 'User deleted successfully'
         })
     } catch(err){
         next(appErr(err.message));

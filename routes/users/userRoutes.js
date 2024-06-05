@@ -51,8 +51,8 @@ userRouter.put('/update-password',isLogin , updatePassewordUserCtrl);
 //POST/api/v1/users/profile-photo-upload
 userRouter.post('/profile-photo-upload', upload.single('profile-based'), isLogin, profilePhototoUploadCtrl);
 
-//DELETE/api/v1/users/:id
-userRouter.delete('/:id', deleteUserAccountCtrl);
+//DELETE/api/v1/users/delete/:id
+userRouter.delete('/delete/:id', isLogin, deleteUserAccountCtrl);
 
 //GET/api/v1/users/logout
 userRouter.get('/logout', userLogoutCtrl);
