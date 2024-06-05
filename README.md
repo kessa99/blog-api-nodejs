@@ -577,8 +577,6 @@ To access this feature, you need to provide your authentication token in the req
 }
 ```
 
-When you access this URL with the ID of the user you want to view the profile of, you'll receive a confirmation indicating that you have successfully viewed the profile.
-
 * **Response**
 ```javascript
 {
@@ -616,7 +614,77 @@ When you access this URL with the ID of the user you want to view the profile of
 	}
 }
 ```
+When you access this URL with the ID of the user you want to view the profile of, you'll receive a confirmation indicating that you have successfully viewed the profile.
 
 The `viewersCount` field indicates the number of times this profile has been viewed by other users. In this example, the `viewersCount` is `1`, indicating that this profile has been viewed once.
 
 and you can see in the views the ID of the person who viewed the profile
+
+
+## USER FOLLOW USER
+
+This feature allows an authenticated user to follow another user by providing the ID of that user in the URL.
+
+* **URL**
+```
+GET /api/v1/users/following/:id
+```
+
+**Explanation**
+
+To access this feature, you need to provide your authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **Your authentication token**           |  **yes**       |
+| `:id`             | `string`     | **The ID of the user you want to follow** | **yes**      |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"message": "You have successfully followed this user"
+}
+```
+
+* **Response with Updated User Object**
+```javascript
+{
+	"status": "success",
+	"data": {
+		"_id": "665ef38b693724e3e8356aca",
+		"firstname": "David",
+		"lastname": "Chaka",
+		"email": "chaka@gmail.com",
+		"profilePhoto": "default.jpg",
+		"isBlocked": false,
+		"isAdmin": false,
+		"role": "Editor",
+		"viewers": [
+			"6660b4471a85e6f2b8944d38"
+		],
+		"followers": [
+			"6660b4471a85e6f2b8944d38"
+		],
+		"following": [],
+		"comments": [],
+		"posts": [],
+		"blocked": [],
+		"userAward": "Bronze",
+		"createdAt": "2024-06-04T10:59:23.521Z",
+		"updatedAt": "2024-06-05T19:17:10.641Z",
+		"__v": 2,
+		"fullname": "David Chaka",
+		"initials": 0,
+		"postCounts": "DC",
+		"followersCount": 0,
+		"viewersCount": 1,
+		"blockCount": 0,
+		"id": "665ef38b693724e3e8356aca",
+		"lastPost": "Invalid Date",
+		"lastActive": null
+	}
+}
+```
+
+The response confirms that you have successfully followed the user. Additionally, it provides the updated user object with the `followers` array containing the ID of the user who followed, indicating that this user is now being followed by someone else.
