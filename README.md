@@ -688,3 +688,208 @@ To access this feature, you need to provide your authentication token in the req
 ```
 
 The response confirms that you have successfully followed the user. Additionally, it provides the updated user object with the `followers` array containing the ID of the user who followed, indicating that this user is now being followed by someone else.
+
+
+## USER UNFOLLOW USER
+
+This feature allows an authenticated user to unfollow another user by providing the ID of that user in the URL.
+
+* **URL**
+```
+GET /api/v1/users/unfollow/:id
+```
+
+**Explanation**
+
+To access this feature, you need to provide your authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **Your authentication token**           |  **yes**       |
+| `:id`             | `string`     | **The ID of the user you want to unfollow** | **yes**      |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"message": "You have successfully unfollowed this user"
+}
+```
+
+* **Response with Updated User Object**
+```javascript
+{
+	"status": "success",
+	"data": {
+		"_id": "665ef38b693724e3e8356aca",
+		"firstname": "David",
+		"lastname": "Chaka",
+		"email": "chaka@gmail.com",
+		"profilePhoto": "default.jpg",
+		"password": "$2b$10$0q2sBRleZhl.cVo1IjXN1OYmd2b5nj57LlQ8bQwrO84ibDIzY7kNq",
+		"isBlocked": false,
+		"isAdmin": false,
+		"role": "Editor",
+		"viewers": [
+			"6660b4471a85e6f2b8944d38"
+		],
+		"followers": [],
+		"following": [],
+		"comments": [],
+		"posts": [],
+		"blocked": [],
+		"userAward": "Bronze",
+		"createdAt": "2024-06-04T10:59:23.521Z",
+		"updatedAt": "2024-06-05T19:22:46.092Z",
+		"__v": 3,
+		"fullname": "David Chaka",
+		"initials": 0,
+		"postCounts": "DC",
+		"followersCount": 0,
+		"viewersCount": 1,
+		"blockCount": 0,
+		"id": "665ef38b693724e3e8356aca",
+		"lastPost": "Invalid Date",
+		"lastActive": null
+	}
+}
+```
+
+The response confirms that you have successfully unfollowed the user. Additionally, it provides the updated user object with the `followers` array now empty, indicating that no one is following this user anymore.
+
+
+Certainly! Here's the documentation for the "User Block User" feature:
+
+## USER BLOCK USER
+
+* **URL**
+```
+GET /api/v1/users/block/:id
+```
+
+**Explanation**
+
+To access this feature, you need to provide your authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **Your authentication token**           |  **yes**       |
+| `:id`             | `string`     | **The ID of the user you want to block** | **yes**      |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"message": "You have successfully blocked this user"
+}
+```
+
+* **Response with Updated User Object**
+```javascript
+{
+	"status": "success",
+	"data": {
+		"_id": "6660b4471a85e6f2b8944d38",
+		"firstname": "Viiane",
+		"lastname": "Kuki",
+		"email": "kuki@gmail.com",
+		"profilePhoto": "default.jpg",
+		"password": "$2b$10$q1cKLP1lDIbX.v4Wib38NelOWCahzWTG8yeJ6MS.PMxDmdWHZzDfC",
+		"isBlocked": false,
+		"isAdmin": false,
+		"role": "Editor",
+		"viewers": [],
+		"followers": [],
+		"following": [],
+		"comments": [],
+		"posts": [],
+		"blocked": [
+			"6660b4471a85e6f2b8944d38"
+		],
+		"userAward": "Bronze",
+		"createdAt": "2024-06-05T18:53:59.100Z",
+		"updatedAt": "2024-06-05T19:33:59.375Z",
+		"__v": 3,
+		"fullname": "Viiane Kuki",
+		"initials": 0,
+		"postCounts": "VK",
+		"followersCount": 0,
+		"viewersCount": 0,
+		"blockCount": 1,
+		"id": "6660b4471a85e6f2b8944d38",
+		"lastPost": "Invalid Date",
+		"lastActive": null
+	}
+}
+```
+
+The response confirms that you have successfully blocked the user. Additionally, it provides the updated user object with the `blocked` array containing the ID of the user who was blocked, indicating that this user is now blocked.
+
+
+Sure! Here's the documentation for the "User Unblock User" feature:
+
+## USER UNBLOCK USER
+
+This feature allows an authenticated user to unblock another user by providing the ID of that user in the URL.
+
+* **URL**
+```
+GET /api/v1/users/unblock/:id
+```
+
+**Explanation**
+
+To access this feature, you need to provide your authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **Your authentication token**           |  **yes**       |
+| `:id`             | `string`     | **The ID of the user you want to unblock** | **yes**      |
+
+* **Response**
+```javascript
+{
+	"status": "success",
+	"message": "You have successfully unblocked this user"
+}
+```
+
+* **Response with Updated User Object**
+```javascript
+{
+	"status": "success",
+	"data": {
+		"_id": "6660b4471a85e6f2b8944d38",
+		"firstname": "Viiane",
+		"lastname": "Kuki",
+		"email": "kuki@gmail.com",
+		"profilePhoto": "default.jpg",
+		"password": "$2b$10$q1cKLP1lDIbX.v4Wib38NelOWCahzWTG8yeJ6MS.PMxDmdWHZzDfC",
+		"isBlocked": false,
+		"isAdmin": false,
+		"role": "Editor",
+		"viewers": [],
+		"followers": [],
+		"following": [],
+		"comments": [],
+		"posts": [],
+		"blocked": [],
+		"userAward": "Bronze",
+		"createdAt": "2024-06-05T18:53:59.100Z",
+		"updatedAt": "2024-06-05T19:40:39.737Z",
+		"__v": 4,
+		"fullname": "Viiane Kuki",
+		"initials": 0,
+		"postCounts": "VK",
+		"followersCount": 0,
+		"viewersCount": 0,
+		"blockCount": 0,
+		"id": "6660b4471a85e6f2b8944d38",
+		"lastPost": "Invalid Date",
+		"lastActive": null
+	}
+}
+```
+
+The response confirms that you have successfully unblocked the user. Additionally, it provides the updated user object with the `blocked` array now empty, indicating that this user is no longer blocked.
+

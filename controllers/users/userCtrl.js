@@ -241,7 +241,6 @@ const deleteUserAccountCtrl = async(req, res, next) => {
         })
     } catch(err){
         next(appErr(err.message));
-        console.log(err.message);
     }
 };
 
@@ -370,11 +369,13 @@ const unFollowCtrl = async(req, res, next) => {
 const blockUsersCtrl = async (req, res, next) => {
     try {
         // 1. Find the user to be blocked
-        const userToBeBlocked = await User.findById(req.params.id);
+        const userToBeBlocked = await User.findById(req.userAuth);
 
         // 2. Find the user who is blocking
         const userWhoBlock = await User.findById(req.userAuth);
 
+        // console.log('celui qui va etre bloque', userToBeBlocked);
+        // console.log('celui qui bloque:', userWhoBlock);
         // 3. Check if userToBeBlocked and userWhoBlock are found
         if (userToBeBlocked && userWhoBlock) {
             // 4. Check if userWhoBlock is already in the blocked array
@@ -384,7 +385,7 @@ const blockUsersCtrl = async (req, res, next) => {
 
             // 5. If user is already blocked
             if (isUserAlreadyBlocked) {
-                return next(new AppErr('You have already blocked this user', 404));
+                return next(appErr('You have already blocked this user'));
             } else {
                 // 6. Push the userToBeBlocked to the userWhoBlock blocked array
                 userWhoBlock.blocked.push(userToBeBlocked._id);
@@ -397,10 +398,10 @@ const blockUsersCtrl = async (req, res, next) => {
                 });
             }
         } else {
-            return next(new AppErr('User not found', 404));
+            return next(appErr('User not found'));
         }
     } catch (err) {
-        return next(new AppErr(err.message, 500));
+        return next(appErr(err.message));
     }
 };
 
@@ -408,7 +409,7 @@ const blockUsersCtrl = async (req, res, next) => {
 const unBlockUserCtrl = async(req, res, next) => {
     try{
         // 1.find the user to be unblocked
-        const userToBeUnblocked = await User.findById(req.params.id);
+        const userToBeUnblocked = await User.findById(req.userAuth);
 
         // 2.find the user who is unblocking
         const userWhoUnblock = await User.findById(req.userAuth);
@@ -421,7 +422,7 @@ const unBlockUserCtrl = async(req, res, next) => {
             );
             // 5.if user is not blocked
             if (!isUserAlreadyBlocked) {
-                return next(new AppErr('You have not blocked this user', 404));
+                return next(appErr('You have not blocked this user', 404));
             } else {
                 // 6.remove the userToBeUnblocked from the main user
                 userWhoUnblock.blocked = userWhoUnblock.blocked.filter(
