@@ -25,19 +25,19 @@ const {
 postRouter.post('/', isLogin, upload.single('image'), createpostCtrl);
 
 //GET/api/v1/posts/:id
-postRouter.get('/:id', postGetOneCtrl);
+postRouter.get('/:id', isLogin, postGetOneCtrl);
 
 //GET/api/v1/posts
 postRouter.get('/',isLogin ,getAllPostCtrl);
 
 //GET/api/v1/posts
-postRouter.get('like/:id' ,toogleLikePostCtrl);
+postRouter.get('/likes/:id', isLogin ,toogleLikePostCtrl);
 
 //GET/api/v1/posts
-postRouter.get('dislike/:id' ,toogleDisLikePostCtrl);
+postRouter.get('/dislike/:id', isLogin ,toogleDisLikePostCtrl);
 
-//GET/api/v1/posts
-postRouter.get('detail/:id',isLogin ,postDetailsCtrl);
+//GET/api/v1/posts/detail/:id
+postRouter.get('/detail/:id',isLogin ,postDetailsCtrl);
 
 //PUT/api/v1/posts/:id
 postRouter.put('/:id',isLogin, postUpdateCtrl);

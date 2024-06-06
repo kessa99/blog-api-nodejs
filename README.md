@@ -1214,3 +1214,449 @@ To delete a category, the admin must provide their authentication token in the r
 ```
 
 This endpoint allows an admin to delete an existing category. Upon successful deletion, the server returns a confirmation message indicating that the category has been successfully deleted.
+
+
+Here is the documentation for creating a post:
+
+## Create Post
+
+* **URL**
+```
+POST /api/v1/posts/
+```
+
+**Explanation**
+
+To create a new post, the user must provide their authentication token in the request header. The request body should contain the post details, including the title, description, category, user, and photo.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **User's authentication token**         |  **yes**       |
+| `title`           | `string`     | **Title of the post**                   |  **yes**       |
+| `description`     | `string`     | **Description of the post**             |  **yes**       |
+| `category`        | `string`     | **ID of the category**                  |  **yes**       |
+| `user`            | `string`     | **ID of the author**                    |  **yes**       |
+| `photo`           | `string`     | **Photo URL of the post(optionel)**     |  **yes**       |
+
+* **Request Body Example**
+```json
+{
+	"title": "The World Cars",
+	"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+	"category": "6660dd96ecb84735db6b1dcf"
+}
+```
+
+* **Response**
+```json
+{
+	"status": "success",
+	"data": {
+		"title": "The World Cars",
+		"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+		"category": "6660dd96ecb84735db6b1dcf",
+		"numViews": [],
+		"comments": [],
+		"likes": [],
+		"dislikes": [],
+		"user": "665ef38b693724e3e8356aca",
+		"_id": "666100a58570095bbe9af881",
+		"createdAt": "2024-06-06T00:19:49.384Z",
+		"updatedAt": "2024-06-06T00:19:49.384Z",
+		"__v": 0,
+		"id": "666100a58570095bbe9af881",
+		"numViewsCount": 0,
+		"likesCount": 0,
+		"dislikesCount": 0,
+		"likePercentage": "NaN%",
+		"dislikePercentage": "NaN%",
+		"DAYSaGO": "Today"
+	}
+}
+```
+
+This endpoint allows a user to create a new post. Upon successful creation, the server returns the details of the newly created post, including its title, description, category, author, and other relevant information.
+
+
+## Get All Posts
+
+* **URL**
+```
+GET /api/v1/posts/
+```
+
+**Explanation**
+
+This endpoint retrieves all posts. The response is filtered to exclude posts where the logged-in user is blocked by the post owner. The user must provide their authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **User's authentication token**         |  **yes**       |
+
+* **Response**
+```json
+{
+	"status": "success",
+	"data": [
+		{
+			"_id": "666100a58570095bbe9af881",
+			"title": "The World Cars",
+			"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+			"category": {
+				"_id": "6660dd96ecb84735db6b1dcf",
+				"title": "Car"
+			},
+			"numViews": [],
+			"comments": [],
+			"likes": [],
+			"dislikes": [],
+			"user": {
+				"_id": "665ef38b693724e3e8356aca",
+				"firstname": "David",
+				"lastname": "Chaka",
+				"email": "chaka@gmail.com",
+				"profilePhoto": "default.jpg",
+				"password": "$2b$10$0q2sBRleZhl.cVo1IjXN1OYmd2b5nj57LlQ8bQwrO84ibDIzY7kNq",
+				"isBlocked": false,
+				"isAdmin": false,
+				"role": "Editor",
+				"viewers": [
+					"6660b4471a85e6f2b8944d38"
+				],
+				"followers": [],
+				"following": [],
+				"comments": [],
+				"posts": [
+					"666100a58570095bbe9af881",
+					"6661032946ee16b9a7bdad00"
+				],
+				"blocked": [],
+				"userAward": "Bronze",
+				"createdAt": "2024-06-04T10:59:23.521Z",
+				"updatedAt": "2024-06-06T00:30:34.091Z",
+				"__v": 5,
+				"fullname": "David Chaka",
+				"initials": 2,
+				"postCounts": "DC",
+				"followersCount": 0,
+				"viewersCount": 1,
+				"blockCount": 0,
+				"id": "665ef38b693724e3e8356aca",
+				"lastPost": "Thu Jun 06 2024",
+				"lastActive": 0
+			},
+			"createdAt": "2024-06-06T00:19:49.384Z",
+			"updatedAt": "2024-06-06T00:19:49.384Z",
+			"__v": 0,
+			"id": "666100a58570095bbe9af881",
+			"numViewsCount": 0,
+			"likesCount": 0,
+			"dislikesCount": 0,
+			"likePercentage": "NaN%",
+			"dislikePercentage": "NaN%",
+			"DAYSaGO": "Today"
+		},
+		{
+			"_id": "6661032946ee16b9a7bdad00",
+			"title": "The World Cars",
+			"description": "Lorem ipsum . Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+			"category": {
+				"_id": "6660dd96ecb84735db6b1dcf",
+				"title": "Car"
+			},
+			"numViews": [],
+			"comments": [],
+			"likes": [],
+			"dislikes": [],
+			"user": {
+				"_id": "665ef38b693724e3e8356aca",
+				"firstname": "David",
+				"lastname": "Chaka",
+				"email": "chaka@gmail.com",
+				"profilePhoto": "default.jpg",
+				"password": "$2b$10$0q2sBRleZhl.cVo1IjXN1OYmd2b5nj57LlQ8bQwrO84ibDIzY7kNq",
+				"isBlocked": false,
+				"isAdmin": false,
+				"role": "Editor",
+				"viewers": [
+					"6660b4471a85e6f2b8944d38"
+				],
+				"followers": [],
+				"following": [],
+				"comments": [],
+				"posts": [
+					"666100a58570095bbe9af881",
+					"6661032946ee16b9a7bdad00"
+				],
+				"blocked": [],
+				"userAward": "Bronze",
+				"createdAt": "2024-06-04T10:59:23.521Z",
+				"updatedAt": "2024-06-06T00:30:34.091Z",
+				"__v": 5,
+				"fullname": "David Chaka",
+				"initials": 2,
+				"postCounts": "DC",
+				"followersCount": 0,
+				"viewersCount": 1,
+				"blockCount": 0,
+				"id": "665ef38b693724e3e8356aca",
+				"lastPost": "Thu Jun 06 2024",
+				"lastActive": 0
+			},
+			"createdAt": "2024-06-06T00:30:33.924Z",
+			"updatedAt": "2024-06-06T00:30:33.924Z",
+			"__v": 0,
+			"id": "6661032946ee16b9a7bdad00",
+			"numViewsCount": 0,
+			"likesCount": 0,
+			"dislikesCount": 0,
+			"likePercentage": "NaN%",
+			"dislikePercentage": "NaN%",
+			"DAYSaGO": "Today"
+		}
+	]
+}
+```
+
+This endpoint allows a user to retrieve all posts. The server will return only the posts where the logged-in user is not blocked by the post owner. The response includes detailed information about each post, including its title, description, category, author, and other relevant information.
+
+## Like a Post
+
+* **URL**
+```
+POST /api/v1/posts/likes/:id
+```
+
+**Explanation**
+
+This endpoint allows a user to like a post. The user must provide their authentication token in the request header. The `:id` parameter in the URL should be the ID of the post to like.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **User's authentication token**         |  **yes**       |
+| `:id`             | `string`     | **ID of the post to like**              |  **yes**       |
+
+
+* **Response Example**
+```json
+{
+	"status": "success",
+	"data": {
+		"_id": "666100a58570095bbe9af881",
+		"title": "The World Cars",
+		"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+		"category": "6660dd96ecb84735db6b1dcf",
+		"numViews": [],
+		"comments": [],
+		"likes": [
+			"665ef38b693724e3e8356aca"
+		],
+		"dislikes": [],
+		"user": "665ef38b693724e3e8356aca",
+		"createdAt": "2024-06-06T00:19:49.384Z",
+		"updatedAt": "2024-06-06T00:45:29.575Z",
+		"__v": 1,
+		"id": "666100a58570095bbe9af881",
+		"numViewsCount": 0,
+		"likesCount": 1,
+		"dislikesCount": 0,
+		"likePercentage": "100%",
+		"dislikePercentage": "NaN%",
+		"DAYSaGO": "Today"
+	}
+}
+```
+
+## Like a Post
+
+* **URL**
+```
+POST /api/v1/posts/dislikes/:id
+```
+
+**Explanation**
+
+This endpoint allows a user to like a post. The user must provide their authentication token in the request header. The `:id` parameter in the URL should be the ID of the post to like.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **User's authentication token**         |  **yes**       |
+| `:id`             | `string`     | **ID of the post to like**              |  **yes**       |
+
+
+* **Response Example**
+```json
+{
+	"status": "success",
+	"data": {
+		"_id": "666100a58570095bbe9af881",
+		"title": "The World Cars",
+		"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+		"category": "6660dd96ecb84735db6b1dcf",
+		"numViews": [],
+		"comments": [],
+		"likes": [
+			"665ef38b693724e3e8356aca"
+		],
+		"dislikes": [
+			"665ef38b693724e3e8356aca"
+		],
+		"user": "665ef38b693724e3e8356aca",
+		"createdAt": "2024-06-06T00:19:49.384Z",
+		"updatedAt": "2024-06-06T00:51:59.377Z",
+		"__v": 2,
+		"id": "666100a58570095bbe9af881",
+		"numViewsCount": 0,
+		"likesCount": 1,
+		"dislikesCount": 1,
+		"likePercentage": "50%",
+		"dislikePercentage": "50%",
+		"DAYSaGO": "Today"
+	}
+}
+```
+
+## Get Post Details
+
+* **URL**
+```
+GET /api/v1/posts/detail/:id
+```
+
+**Explanation**
+
+This endpoint allows a user to retrieve the details of a specific post by providing the post ID in the URL. The user must provide their authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **User's authentication token**         |  **yes**       |
+| `:id`             | `string`     | **ID of the post to retrieve**          |  **yes**       |
+
+
+
+* **Response Example**
+```json
+{
+	"status": "success",
+	"data": {
+		"_id": "666100a58570095bbe9af881",
+		"title": "The World Cars",
+		"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+		"category": "6660dd96ecb84735db6b1dcf",
+		"numViews": [
+			"665ef38b693724e3e8356aca"
+		],
+		"comments": [],
+		"likes": [
+			"665ef38b693724e3e8356aca"
+		],
+		"dislikes": [
+			"665ef38b693724e3e8356aca"
+		],
+		"user": "665ef38b693724e3e8356aca",
+		"createdAt": "2024-06-06T00:19:49.384Z",
+		"updatedAt": "2024-06-06T00:55:23.938Z",
+		"__v": 3,
+		"id": "666100a58570095bbe9af881",
+		"numViewsCount": 1,
+		"likesCount": 1,
+		"dislikesCount": 1,
+		"likePercentage": "50%",
+		"dislikePercentage": "50%",
+		"DAYSaGO": "Today"
+	}
+}
+```
+
+
+## Update Post
+
+* **URL**
+```
+PUT /api/v1/posts/:id
+```
+
+**Explanation**
+
+This endpoint allows a user to update the details of an existing post. The user must provide their authentication token in the request header and the post ID in the URL. The request body should contain the updated post details.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **User's authentication token**         |  **yes**       |
+| `:id`             | `string`     | **ID of the post to update**            |  **yes**       |
+| `title`           | `string`     | **Updated title of the post**           |  **no**        |
+| `description`     | `string`     | **Updated description of the post**     |  **no**        |
+| `category`        | `string`     | **Updated ID of the category**          |  **no**        |
+| `photo`           | `string`     | **Updated photo URL of the post**       |  **no**        |
+
+* **Request Header Example**
+```
+Authorization: Bearer <your-token-here>
+```
+
+* **Example Request Body**
+```json
+{
+		"description": "Lorem ipsum dolor ."
+}
+```
+
+* **Response Example**
+```json
+{
+	"status": "success",
+	"data": {
+		"_id": "666100a58570095bbe9af881",
+		"title": "The World Cars",
+		"description": "Lorem ipsum dolor .",
+		"category": "6660dd96ecb84735db6b1dcf",
+		"numViews": [
+			"665ef38b693724e3e8356aca"
+		],
+		"comments": [],
+		"likes": [
+			"665ef38b693724e3e8356aca"
+		],
+		"dislikes": [
+			"665ef38b693724e3e8356aca"
+		],
+		"user": "665ef38b693724e3e8356aca",
+		"createdAt": "2024-06-06T00:19:49.384Z",
+		"updatedAt": "2024-06-06T00:58:46.738Z",
+		"__v": 3,
+		"id": "666100a58570095bbe9af881",
+		"numViewsCount": 1,
+		"likesCount": 1,
+		"dislikesCount": 1,
+		"likePercentage": "50%",
+		"dislikePercentage": "50%",
+		"DAYSaGO": "Today"
+	}
+}
+```
+
+
+## Delete Post
+
+* **URL**
+```
+DELETE /api/v1/posts/:id
+```
+
+**Explanation**
+
+This endpoint allows a user to delete a specific post by providing the post ID in the URL. The user must provide their authentication token in the request header.
+
+| Parameter         | Type         | Description                             | Required       |
+| :-----------------| :------------| :---------------------------------------| :--------------|
+| `authentication`  | `string`     | **User's authentication token**         |  **yes**       |
+| `:id`             | `string`     | **ID of the post to delete**            |  **yes**       |
+
+
+* **Response Example**
+```json
+{
+    "status": "success",
+    "message": "Post deleted successfully"
+}
+```

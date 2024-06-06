@@ -1,15 +1,18 @@
 const Post = require('../../model/Post/Post');
 const User = require('../../model/User/User');
-
+const { appErr } = require('../../utils/appErr');
 
 // create a post
 const createpostCtrl = async(req, res, next) => {
-    const {tittle, description, category} = req.body;
+    const {title, description, category} = req.body;
     try{
+        
         // 1.find the user who creating the post
-        const author = await User.findById(req.user._id);
+        const author = await User.findById(req.userAuth);
+        console.log(author)
+        console.log(author.isBlocked)
         // check if user is blocked
-        if(author.blocked){
+        if(author.isBlocked){
             return next(appErr('You are blocked Access Denied'));
         }
         // 2. create a post
@@ -44,30 +47,30 @@ const postGetOneCtrl = async(req, res, next) => {
     }
 }
 
-// get all posts
+// Get all posts
 const getAllPostCtrl = async(req, res, next) => {
     try{
-        // find all posts
+        // Find all posts
         const posts = await Post.find({}).populate('user').populate('category', 'title');
 
-        // chack is the logged in user is blocked by the post owner
+        // Filter posts to exclude those where the logged-in user is blocked by the post owner
         const postsFiltered = posts.filter(post => {
-            // get all blocked users
-            const blockedUsers = post.user.blockedUsers;
+            // Get all blocked users
+            const blockedUsers = post.user.blockedUsers || [];
+            // Check if the logged-in user is blocked
             const isBlocked = blockedUsers.includes(req.userAuth);
-            // if user is blocked return null(so no post show)
-            // return isBlocked ? null: post; or return !isBlocked;
-            // or
+            // Return only posts where the user is not blocked
             return !isBlocked;
         });
+
         res.json({
             status: 'success',
-            data: posts
-        })
+            data: postsFiltered
+        });
     } catch(err){
         next(appErr(err.message));
     }
-}
+};
 
 // tooglelike
 const toogleLikePostCtrl = async(req, res, next) => {
@@ -171,7 +174,7 @@ const postUpdateCtrl = async(req, res, next) => {
         });
         res.json({
             status: 'success',
-            message: 'post Updating successfully'
+            data: post
         })
     } catch(err){
         next(appErr(err.message));
