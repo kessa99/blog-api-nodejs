@@ -186,13 +186,13 @@ userSchema.virtual('fullname').get(function () {
 
 // get post count
 userSchema.virtual('initials').get(function () {
-    return this.posts.length;
+    return `${this.firstname[0]}${this.lastname[0]}`;
 });
 
 
 // GET USER INITIALS
 userSchema.virtual('postCounts').get(function () {
-    return `${this.firstname[0]}${this.lastname[0]}`;
+    return this.posts.length;
 });
 
 // get followers count 

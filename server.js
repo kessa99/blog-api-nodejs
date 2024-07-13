@@ -8,6 +8,8 @@ const mongoose = require('mongoose');
 //import dotenv
 const dotenv = require('dotenv');
 
+const setupSwagger = require('./config/swagger');
+
 //import routes
 // ./routes/users/userRoutes.js
 const userRouter = require('./routes/users/userRoutes');
@@ -20,24 +22,10 @@ const globalErrorHandler = require('./middlewares/globalErrorHandler');
 dotenv.config();
 require('./config/dbConnect');
 const app = express();
+setupSwagger(app);
 
 // middleware
 app.use(express.json());
-
-// const userAuth = {
-//     isLogin: true,
-//     isAdmin: false,
-// }
-
-// app.use((req, res, next) => {
-//     if (userAuth.isLogin) {
-//         next();
-//     } else {
-//         res.json({
-//             message: 'You are not login'
-//         });
-//     }
-// });
 
 
 
@@ -64,5 +52,6 @@ app.use('*', (req, res) => {
 const PORT = process.env.PORT || 9000;
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port http://localhost:${PORT}`);
+    console.log(`Swagger documentation is available at http://localhost:${PORT}/api-docs`)
 });
